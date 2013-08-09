@@ -1,5 +1,5 @@
-Auth # SamsonPHP 
+ActiveRecord # SamsonPHP 
 
-Basic authorization module
+Basic ORM module
 
 egorov@samsonos.com

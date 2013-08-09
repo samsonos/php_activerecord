@@ -384,10 +384,10 @@ class dbMySQLConnector implements idbConnector
 	}
 	
 	/**
-	 * Сгенерировать динамические сущности для работы с таблицами БД
-	 * @param array $tables_data Коллекция описывающая структуру таблиц БД	  
+	 * Generate ORM classes 
+	 * @param string $force Force class generation
 	 */
-	public function generate( array & $tables_data = NULL )
+	public function generate( $force = false )
 	{		
 		// Processed permanent table relations
 		$db_relations = array();	
@@ -434,14 +434,10 @@ class dbMySQLConnector implements idbConnector
 		$md5_file_func = getcwd().'/.'.$bstr.'.db_func.dbs';
 		
 		// Если еще не создан отпечаток базы данных - создадим его
-		if ( !file_exists( $md5_file ) )
+		if ( !file_exists( $md5_file ) || $force )
 		{
 			// Удалим все файлы с расширением map
-			foreach ( File::dir( getcwd(), 'dbs' ) as $file )
-			{
-				unlink( $file );
-				//trace($file);
-			}
+			foreach ( File::dir( getcwd(), 'dbs' ) as $file ) unlink( $file );		
 		
 			// Если еще не создан отпечаток базы данных - создадим его
 		
@@ -472,15 +468,13 @@ class dbMySQLConnector implements idbConnector
 			
 			// Запишем файл для IDE в корень проекта
 			file_put_contents($md5_file, '<?php '.$db_classes.'?>' );
-			file_put_contents($md5_file_func, '<?php '.$db_func.'?>' );
-			//trace("Производилось обновление конфигурации базы данных. Перезагрузите страницу.");
-			//die();
-				
+			file_put_contents($md5_file_func, '<?php '.$db_func.'?>' );			
 		}
 		// Иначе просто его подключим 
 		else 
 		{			
-			include($md5_file);	include($md5_file_func);
+			include($md5_file);	
+			include($md5_file_func);
 		}
 		
 		//elapsed('end');

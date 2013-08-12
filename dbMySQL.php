@@ -178,13 +178,51 @@ class dbMySQL extends dbMySQLConnector implements idb
 	{
 		// Get SQL
 		$sql = 'SELECT Count(*) as __Count FROM ('.$this->prepareSQL( $class_name, $query ).') as __table';
-		
 		// Выполним запрос к БД
 		$db_data = $this->query( $sql );
 			
 		return $db_data[0]['__Count'];
 	}
 	
+	/** Count query result */
+	public function innerCount( $class_name, dbQuery $query )
+	{
+		$params = $this->__get_table_data( $class_name );
+		// Получим переменные для запроса
+		extract($params);
+			
+		// Текст выборки полей
+		$select = $_table_name.'.*';//$_sql_select['this'];
+		
+		// Получим текст цели запроса
+		$from = 'SELECT '.$_sql_select['this'];
+		
+		//trace($_sql_select['this']);
+		
+		// Если заданны виртуальные поля, добавим для них колонки
+		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
+		
+		// From part
+		$from .="\n".' FROM '.$_sql_from['this'];
+		
+		// Если существуют условия для главной таблицы в запросе - получим их
+		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE '.$this->getConditions($query->own_condition, $class_name);
+		
+		// Добавим нужные групировщики
+		$query->own_group = array_merge( $_own_group, is_array($query->own_group) ? $query->own_group : array() );
+		if( sizeof( $query->own_group )) $from .= 'GROUP BY '.implode(',', $query->own_group);
+		// Если указана сортировка результатов
+		if( sizeof( $query->own_order )) $from .= "\n".' ORDER BY '.$query->own_order[0].' '.$query->own_order[1];
+		// Если нужно ограничить к-во записей в выдаче по главной таблице
+		if( sizeof( $query->own_limit )) $from .= "\n".' LIMIT '.$query->own_limit[0].(isset($query->own_limit[1])?','.$query->own_limit[1]:'');
+			
+		// Get SQL
+		$sql = 'SELECT Count(*) as __Count FROM ('.$this->prepareInnerSQL($class_name, $query, $params).') as __table';
+		// Выполним запрос к БД
+		$db_data = $this->query( $sql );
+			
+		return $db_data[0]['__Count'];
+	}
 	/**
 	 * @see idb::find()
 	 */
@@ -233,9 +271,54 @@ class dbMySQL extends dbMySQLConnector implements idb
 		return $ret;
 	}
 	
-	/**	 
-	 * @see idb::profiler()
+	
+	/**
+	 * Generic database migration handler
+	 * @param string $classname Class for searching migration methods
+	 * @param string $version_handler External handler for interacting with database version
 	 */
+	public function migration( $classname, $version_handler )
+	{		
+		if( !is_callable( $version_handler ) ) return e('No version handler is passed', E_SAMSON_ACTIVERECORD_ERROR);
+		
+		// Get current database version
+		$version = call_user_func( $version_handler );
+		
+		// DB vesion migrating mechanism
+		foreach( get_class_methods( $classname ) as $m )
+		{
+			// Parse migration method name to get migrating versions
+			if( preg_match('/^migrate_(?<from>\d+)_to_(?<to>\d+)/i', $m, $matches) )
+			{
+				$from = $matches['from'];
+				$to = $matches['to'];
+		
+				// If we found migration method from current db version
+				if( $from == $version )
+				{
+					elapsed('Databse migration from version: '.$from.' -> '.$to);
+						
+					// Run migration method
+					if( $this->$m() !== false )
+					{
+						// Save current version for further migrating
+						$version = $to;
+						
+						// Call database version changing handler
+						call_user_func( $version_handler, $to );		
+					}
+					// Break and error
+					else
+					{
+						e('Database migration from ## -> ## - has Failed', E_SAMSON_ACTIVERECORD_ERROR, array( $from, $to));
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	/** @see idb::profiler() */
 	public function profiler()
 	{					
 		// Выведем список объектов из БД
@@ -276,35 +359,15 @@ class dbMySQL extends dbMySQLConnector implements idb
 	private function prepareSQL( $class_name, dbQuery $query )
 	{
 		//elapsed( 'dbMySQL::find() Начало');
-		
+		$params = $this->__get_table_data( $class_name );
 		// Получим переменные для запроса
-		extract($this->__get_table_data( $class_name ));
+		extract($params);
 			
 		// Текст выборки полей
 		$select = $_table_name.'.*';//$_sql_select['this'];
 		
-		// Получим текст цели запроса
-		$from = ' ( SELECT '.$_sql_select['this'];
+		$from = ' ( '.$this->prepareInnerSQL( $class_name, $query, $params );
 		
-		//trace($_sql_select['this']);
-		
-		// Если заданны виртуальные поля, добавим для них колонки
-		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
-		
-		// From part
-		$from .="\n".' FROM '.$_sql_from['this'];
-		
-		// Если существуют условия для главной таблицы в запросе - получим их
-		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE '.$this->getConditions($query->own_condition, $class_name);
-				
-		// Добавим нужные групировщики		
-		$query->own_group = array_merge( $_own_group, is_array($query->own_group) ? $query->own_group : array() );
-		if( sizeof( $query->own_group )) $from .= 'GROUP BY '.implode(',', $query->own_group);
-		// Если указана сортировка результатов
-		if( sizeof( $query->own_order )) $from .= "\n".' ORDER BY '.$query->own_order[0].' '.$query->own_order[1];
-		// Если нужно ограничить к-во записей в выдаче по главной таблице
-		if( sizeof( $query->own_limit )) $from .= "\n".' LIMIT '.$query->own_limit[0].(isset($query->own_limit[1])?','.$query->own_limit[1]:'');
-			
 		// Добавим алиас
 		$from .= ' ) as '.$_table_name;
 		
@@ -343,6 +406,31 @@ class dbMySQL extends dbMySQLConnector implements idb
 		if( isset($GLOBALS['show_sql']) ) trace( $sql);
 		
 		return $sql;
+	}
+	
+	private function prepareInnerSQL( $class_name, dbQuery $query, $params )
+	{
+		// Получим текст цели запроса
+		$from = 'SELECT '.$params['_sql_select']['this'];
+		
+		// Если заданны виртуальные поля, добавим для них колонки
+		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
+		
+		// From part
+		$from .="\n".' FROM '.$params['_sql_from']['this'];
+		
+		// Если существуют условия для главной таблицы в запросе - получим их
+		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE '.$this->getConditions($query->own_condition, $class_name);
+		
+		// Добавим нужные групировщики
+		$query->own_group = array_merge( $params['_own_group'], is_array($query->own_group) ? $query->own_group : array() );
+		if( sizeof( $query->own_group )) $from .= 'GROUP BY '.implode(',', $query->own_group);
+		// Если указана сортировка результатов
+		if( sizeof( $query->own_order )) $from .= "\n".' ORDER BY '.$query->own_order[0].' '.$query->own_order[1];
+		// Если нужно ограничить к-во записей в выдаче по главной таблице
+		if( sizeof( $query->own_limit )) $from .= "\n".' LIMIT '.$query->own_limit[0].(isset($query->own_limit[1])?','.$query->own_limit[1]:'');
+		
+		return $from;		
 	}
 	
 	private function getConditions( $cond_group, $class_name )

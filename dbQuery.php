@@ -366,6 +366,9 @@ class dbQuery implements idbQuery
 	/** @see idbQuery::count() */
 	public function count( $field = '*' ){return db()->count( $this->class_name, $this ); }
 	
+	/** @see idbQuery::innerCount() */
+	public function innerCount( $field = '*' ){return db()->innerCount( $this->class_name, $this ); }
+	
 	/**	@see idbQuery::parse() */
 	public function parse( $query_text, array $args = NULL )
 	{		

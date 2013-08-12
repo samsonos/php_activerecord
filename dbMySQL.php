@@ -299,7 +299,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 					elapsed('Databse migration from version: '.$from.' -> '.$to);
 						
 					// Run migration method
-					if( $this->$m() !== false )
+					if( call_user_func( array($version_handler[0], $m)) !== false )
 					{
 						// Save current version for further migrating
 						$version = $to;

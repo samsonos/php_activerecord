@@ -279,6 +279,21 @@ class dbQuery implements idbQuery
 	public function notempty( $attribute ){ return $this->cond($attribute,'',dbRelation::NOT_EQUAL); }
 	public function like( $attribute, $value = '' ){ return $this->cond($attribute, $value,dbRelation::LIKE); }
 	
+	/**
+	 * Add condition by primary field
+	 * 
+	 * @param string $value Primary field value
+	 * @return \samson\activerecord\dbQuery Chaining
+	 */
+	public function id( $value )
+	{
+		// PHP 5.2 get primary field
+		eval( '$_primary = '.$this->class_name.'::$_primary;' );	
+		
+		// Set primary field value
+		return $this->cond( $_primary, $value );
+	}
+	
 	/**	 @see idbQuery::cond() */
 	public function cond( $attribute, $value = '', $relation = dbRelation::EQUAL )
 	{			

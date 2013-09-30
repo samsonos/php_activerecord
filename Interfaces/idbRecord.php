@@ -8,20 +8,6 @@ namespace samson\activerecord;
  *
  */
 interface idbRecord
-{		
-	/**
-	 * Выполнить создание записи в БД с привязкой к данному объекту
-	 */
-	public function create();
-	
-	/**
-	 * Сохранить данные записи в БД
-	 */
-	public function save();
-	
-	/**
-	 * Удалить запись из БД
-	 */
-	public function delete();			
+{	
+				
 }
-?>

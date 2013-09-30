@@ -54,7 +54,9 @@ class dbMySQLConnector implements idbConnector
 	public function classes( $class_data, $class_name, $table_name = NULL, array $db_relations = NULL )
 	{		
 		// Сюда соберем код для генерации классов ActiveRecord
-		$class_eval = '';		
+		$class_eval = '';	
+
+		$func_eval = '';
 		
 		// Префикс для функций обращения к классам БД
 		if( ! defined( '__ARQ_Prefix__' )) define( '__ARQ_Prefix__', '_' );			
@@ -364,7 +366,7 @@ class dbMySQLConnector implements idbConnector
 
 			// Закончим описание области имен
 			//$class_eval .= "\n}";
-			$func_eval = '';
+			
 			// Если мы еще не объявляли функцию для данного класса
 			if( ! function_exists( $func_name ) )
 			{
@@ -380,7 +382,7 @@ class dbMySQLConnector implements idbConnector
 		//$this->classes .= $class_eval;		
 		
 		// Вернем строку с описанием классов для таблиц БД
-		return array($class_eval,$func_eval);
+		return array( $class_eval, $func_eval );
 	}
 	
 	/**

@@ -294,6 +294,9 @@ class dbQuery implements idbQuery
 		return $this->cond( $_primary, $value );
 	}
 	
+	/**	 @see idbQuery::where() */
+	public function where( $condition ){ return $this->cond($condition, '', dbRelation::OWN ); }
+	
 	/**	 @see idbQuery::cond() */
 	public function cond( $attribute, $value = '', $relation = dbRelation::EQUAL )
 	{			

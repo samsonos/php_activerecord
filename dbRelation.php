@@ -17,4 +17,5 @@ class dbRelation
 	const LIKE 			= ' LIKE ';
 	const NOTNULL 		= ' IS NOT NULL ';
 	const ISNULL 		= ' IS NULL ';
+	const OWN 			= ' !!! ';
 }

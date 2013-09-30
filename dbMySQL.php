@@ -478,7 +478,11 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Если аргумент условия - это НЕ массив - оптимизации по более частому условию
 		if( !is_array( $arg->value ) ) 
 		{
+			// NULL condition
 			if( $arg->relation === dbRelation::NOTNULL || $arg->relation === dbRelation::ISNULL ) return $sql_cond_t.$arg->relation;
+			// Own condition
+			else if( $arg->relation === dbRelation::OWN) return $arg->field;
+			// Regular condition
 			else return $sql_cond_t.$arg->relation.$this->protectQueryValue( $arg->value);
 		}
 		// Если аргумент условия - это массив и в нем есть значения

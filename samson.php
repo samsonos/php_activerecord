@@ -1,6 +1,8 @@
 <?php
 namespace samson\activerecord;
 
+use samson\core\File;
+
 use samson\core\CompressableExternalModule;
 
 class ActiveRecordConnector extends CompressableExternalModule
@@ -51,17 +53,20 @@ class ActiveRecordConnector extends CompressableExternalModule
 			'login'=> $this->login,
 			'pwd' =>  $this->pwd,
 			'host' =>  $this->host
-		));		
+		));	
+		
+		// Load existing database data files
+		//foreach ( File::dir(__SAMSON_CWD__, 'dbs') as $db_data) include($db_data);
+		
+		//[PHPCOMPRESSOR(remove,start)]
+		db()->generate();
+		//[PHPCOMPRESSOR(remove,end)]
 	}
 
 	/** @see \samson\core\ExternalModule::init() */
 	public function init( array $params = array() )
 	{	
-		parent::init( $params );
-
-		//[PHPCOMPRESSOR(remove,start)]
-		db()->generate();
-		//[PHPCOMPRESSOR(remove,end)]
+		parent::init( $params );		
 		
 		// Connect to database
 		db()->connect(array(

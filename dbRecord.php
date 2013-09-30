@@ -74,7 +74,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	public function __construct( $id = NULL, $class_name = NULL )	
 	{				
 		// Запишем имя текущего класса
-		$this->class_name = get_class($this); //$class_name; 
+		if(!isset($this->class_name))$this->class_name = get_class($this); //$class_name; 
 		
 		//if( get_class($this) == 'Order') elapsed('ЩКВУК!!!');
 

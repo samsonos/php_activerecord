@@ -24,6 +24,9 @@ class ActiveRecordConnector extends CompressableExternalModule
 	public $pwd;
 	public $host = '127.0.0.1';
 	
+	/* Array of additional relations to set */
+	public $relations  = array();
+	
 	/** @see \samson\core\CompressableExternalModule::beforeCompress() */
 	public function beforeCompress( & $obj = null, array & $code = null )
 	{
@@ -46,7 +49,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 	
 	/** @see \samson\core\ExternalModule::prepare() */
 	public function prepare()
-	{
+	{		
 		// Connect to database
 		db()->connect(array(
 			'name' => $this->name,
@@ -55,6 +58,19 @@ class ActiveRecordConnector extends CompressableExternalModule
 			'host' =>  $this->host
 		));	
 		
+		// Create specific relations
+		foreach ( $this->relations as $args )
+		{
+			switch(sizeof($args)) 
+			{
+				case 2: new TableRelation($args[0], $args[1]); break;
+				case 3: new TableRelation($args[0], $args[1], $args[2]); break;
+				case 4: new TableRelation($args[0], $args[1], $args[2], $args[3]); break;
+				case 5: new TableRelation($args[0], $args[1], $args[2], $args[3], $args[4]); break;
+				case 6: new TableRelation($args[0], $args[1], $args[2], $args[3], $args[4], $args[5]); break;				
+			}				
+		}
+			
 		// Load existing database data files
 		//foreach ( File::dir(__SAMSON_CWD__, 'dbs') as $db_data) include($db_data);
 		

@@ -682,7 +682,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 				{	
 					$join_name = $relation_data->relation;
 					$join_table = $relation_data->table;
-					
+										
 					//trace('Filling related table:'.$join_name.'/'.$join_table);					
 					
 					// Get real classname of the table without alias

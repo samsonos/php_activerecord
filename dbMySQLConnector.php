@@ -261,7 +261,7 @@ class dbMySQLConnector implements idbConnector
 					// If child field not specified
 					if( !isset($i->child_field{0})) $cf  =  '`'.$i->child.'`.`'.$pfield.'`';					
 					// If no "." symbol in child field name append child table name
-					else $cf = strpos( $i->child_field, '.') === false ? '`'.$i->child.'`.'.$i->child_field : $i->child_field;
+					else $cf = strpos( $i->child_field, '.') === false ? '`'.(isset($i->alias{0})?$i->alias:$i->child).'`.'.$i->child_field : $i->child_field;
 						
 					// And joining field
 					$class_eval .= ' ON '.$pf.' = '.$cf.'",';
@@ -271,13 +271,13 @@ class dbMySQLConnector implements idbConnector
 					
 					$relation_eval .= "\n\t\t".'"'.$r_table_name.'" => array(';
 					
-					$relalias_eval .= "\n\t\t".'"'.$r_table_name.'" => "'.$r_table.'",';
+					$relalias_eval .= "\n\t\t".'"'.$r_table_name.'" => "'.$i->child.'",';
 					
 					// Array for select block
 					$select_eval_array = array();
 					
 					// Переберем поля связанной таблицы
-					foreach ( self::$tables[ $r_table ] as $column_data )
+					foreach ( self::$tables[ $i->child ] as $column_data )
 					{
 						// Имя поля связанной таблицы
 						$r_field_name = $r_table_name.'_'.$column_data['Field'];
@@ -407,6 +407,7 @@ class dbMySQLConnector implements idbConnector
 			$db_relations[ $row->parent ][ $child_relation ] = $row;
 		}		
 	
+		//trace($db_relations);
 		// Получим описание относительных таблиц
 		$db_mapper = $this->mapper();	
 		

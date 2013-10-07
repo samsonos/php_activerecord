@@ -70,26 +70,30 @@ class ActiveRecordConnector extends CompressableExternalModule
 				case 6: new TableRelation($args[0], $args[1], $args[2], $args[3], $args[4], $args[5]); break;				
 			}				
 		}
-			
-		// Load existing database data files
-		//foreach ( File::dir(__SAMSON_CWD__, 'dbs') as $db_data) include($db_data);
 		
-		//[PHPCOMPRESSOR(remove,start)]
-		db()->generate();
-		//[PHPCOMPRESSOR(remove,end)]
+		// Generate db table classes
+		db()->generate();				
 	}
 
 	/** @see \samson\core\ExternalModule::init() */
 	public function init( array $params = array() )
 	{	
-		parent::init( $params );		
-		
+		parent::init( $params );
+
+		//trace('AR:init');
+			
 		// Connect to database
 		db()->connect(array(
 			'name' => $this->name, 
 			'login'=> $this->login, 
 			'pwd' =>  $this->pwd,
 			'host' =>  $this->host
-		));			
+		));	
+
+		//[PHPCOMPRESSOR(remove,start)]
+		
+		// Generate table relations
+		db()->relations();
+		//[PHPCOMPRESSOR(remove,end)]
 	}
 }

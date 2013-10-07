@@ -59,7 +59,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$sql_result = mysql_query( $sql, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );		
 			
 		// Если нужно то выведем запрос
-		//if( isset($_SESSION['__AR_SHOW_QUERY__']) )elapsed($sql);
+		if( isset($_SESSION['__AR_SHOW_QUERY__']) )elapsed($sql);
 		
 		// Если нам вернулся ресурс
 		if( !is_bool($sql_result) )
@@ -414,7 +414,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$from = 'SELECT '.$params['_sql_select']['this'];
 		
 		// Если заданны виртуальные поля, добавим для них колонки
-		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
+		if( sizeof( $query->virtual_fields ) ) $from .= ', '."\n".implode("\n".', ', $query->virtual_fields);
 		
 		// From part
 		$from .="\n".' FROM '.$params['_sql_from']['this'];
@@ -725,6 +725,9 @@ class dbMySQL extends dbMySQLConnector implements idb
 								$r_obj->$field = $db_inner_row[ $lc_field ];				
 							}
 							
+							// Call handler for object filling
+							$r_obj->filled();
+							
 							// Зафиксируем данный класс в локальном кеше
 							dbRecord::$instances[ $join_name ][ $r_obj_id ] = $r_obj;
 						}
@@ -732,9 +735,19 @@ class dbMySQL extends dbMySQLConnector implements idb
 						else $r_obj = dbRecord::$instances[ $join_name ][ $r_obj_id ];						
 						
 						// Если связанный объект привязан как один-к-одному - просто довами ссылку на него
-						if( $_relation_type[ $join_table ] == 0 ) $onetoone[ '_'.$_relation_name ] = $r_obj;
+						if( $_relation_type[ $join_table ] == 0 ) 
+						{
+							$onetoone[ '_'.$join_table ] = $r_obj;
+							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы  
+							$onetoone[ '_'.$_relation_name ] = $r_obj;
+						}
 						// Иначе создадим массив типа: идентификатор -> объект
-						else $onetomany[ '_'.$_relation_name ][ $r_obj_id ] = $r_obj;
+						else
+						{
+							$onetomany[ '_'.$join_table ][ $r_obj_id ] = $r_obj;
+							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы
+							$onetomany[ '_'.$_relation_name ][ $r_obj_id ] = $r_obj;
+						}
 					}
 				}				
 			}		
@@ -742,6 +755,9 @@ class dbMySQL extends dbMySQLConnector implements idb
 			// Присоединим связанные объекты в данные главного объекта
 			$main_obj->onetoone = $onetoone;			
 			$main_obj->onetomany = $onetomany;
+			
+			// Call handler for object filling
+			$main_obj->filled();
 				
 			// Добавим созданный объект в результат
 			$collection[] = $main_obj;

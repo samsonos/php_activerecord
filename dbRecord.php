@@ -46,12 +46,14 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	 * Коллекция связанных объектов один к одному
 	 * @var array
 	 */
+	// TODO: Избавиться от этой коллекции в пользу названия связанной таблицы\алиаса
 	public $onetoone = array();
 	
 	/**
 	 * Коллекция связанных объектов один ко многим
 	 * @var array
 	 */
+	// TODO: Избавиться от этой коллекции в пользу названия связанной таблицы\алиаса
 	public $onetomany = array();
 	
 	/**
@@ -74,7 +76,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	public function __construct( $id = NULL, $class_name = NULL )	
 	{				
 		// Запишем имя текущего класса
-		if(!isset($this->class_name))$this->class_name = get_class($this); //$class_name; 
+		if(!isset($this->class_name)) $this->class_name = get_class($this); //$class_name; 
 		
 		//if( get_class($this) == 'Order') elapsed('ЩКВУК!!!');
 
@@ -147,14 +149,18 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		self::$instances[ $this->class_name ][ $this->id ] = & $this;
 	}
 	
-	/**	 
-	 * @see idbRecord::delete()
-	 */
+	/**	@see idbRecord::delete() */
 	public function delete()
 	{
 		// Если запись привязана к БД то удалим её оттуда
 		if( $this->attached ) db()->delete( $this->class_name, $this );		
 	}	
+	
+	/** Special method called when object has been filled with data */
+	public function filled()
+	{
+		
+	}
 
 	/**
 	 * Создаваемый массив формируется из всех внутренних полей объекта-записи БД
@@ -186,9 +192,6 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		// Переберем связанные 1-1 классы
 		foreach ( $this->onetoone as $name => $obj ) $values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
 		
-		// Переберем значение атрибутов записи - запишем ключом массиву реальное имя колонки в БД
-		//foreach ( $this->_data as $attribute => $value )  $values[ $prefix.$attribute ] = $value;			
-		
 		// Вернем массив атрибутов представляющий запись БД
 		return $values;
 	}
@@ -215,28 +218,5 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	public function offsetGet($offset)			{ return $this->$offset;  }
 	public function offsetUnset($offset){ unset( $this->$offset ); }
 	public function offsetExists($offset){ return property_exists( $this, $offset ); }	
-	
-	//public function __sleep(){	return array( 'id', '_data', 'attached' );}
-	
-	/*
-	
-	public function __get( $key )
-	{	
-		// Попытаемся найти запрашиваемый аттрибут записи
-		if( isset( $this->_data[ $key ] ) ) return $this->_data[ $key ];
-		// Если требуется вернуть идентификатор записи
-		else if( $key == 'id' ) return $this->id;
-	}
-	
-	
-	public function __set( $key, $value )
-	{
-		//elapsed('Устанавливаем '.get_class($this).'-'.$key.'-'.$value);	
-		
-		// Проверим есть ли установливаемый атрибут у данной записи, т.к. ключ регистро-незавимимый - уменьшим его
-		if( isset( $this->_data[ $key ] )) $this->_data[ $key ] = $value;
-		
-		// Вернем пустышку
-		return null;
-	}*/
+
 }

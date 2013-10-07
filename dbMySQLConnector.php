@@ -47,6 +47,37 @@ class dbMySQLConnector implements idbConnector
 	private $created_classes = array();
 	
 	/**
+	 * Build database table column map
+	 * @param $table_name  
+	 */
+	private function __build_columns_map( $table_name, array & $select = array(), array & $map = array(), array & $alias = array(), $alias_table_name = null )
+	{	
+		$alias_table_name = isset($alias_table_name) ? $alias_table_name : $table_name;
+		
+		// Iterate table column data
+		foreach ( self::$tables[ $table_name ] as $column_data )
+		{
+			// Get column name
+			$column = $column_data['Field'];
+		
+			// Build alias name of related table column
+			$column_alias = $alias_table_name.'_'.$column;
+				
+			// Build full name of related table column
+			$column_full = $alias_table_name.'.'.$column;
+		
+			// Store column alias
+			$alias[ $column ] = $column_alias;
+				
+			// Save sql "SELECT" statement
+			$select[] = $column_full.' as '.$column_alias;
+		
+			// Save column map
+			$map[ $column_alias ] = $column_full;
+		}
+	}
+	
+	/**
 	 * Генератор описания классов и функций для работы с таблицами БД
 	 *
 	 * @return string Код на PHP для динамического создания классов и функций обращения к ним
@@ -385,6 +416,131 @@ class dbMySQLConnector implements idbConnector
 		return array( $class_eval, $func_eval );
 	}
 	
+	/** Generate database table relations */
+	public function relations()
+	{
+		// Generate unique file name
+		$relations_file = '.'.md5(serialize(TableRelation::$instances)).'.db_relations.dbs';
+		
+		// Relations file does not exists - create it
+		if( !file_exists($relations_file))
+		{		
+			// Processed permanent table relations
+			$db_relations = array();
+			
+			// Iterate permanent relations
+			foreach( TableRelation::$instances as $row )
+			{
+				// Create relations data for specific table
+				if( ! isset( $db_relations[ $row->parent ] ) ) $db_relations[ $row->parent ] = array();
+					
+				// Define child relation table name
+				$child_relation = !isset($row->alias{0}) ? $row->child : $row->alias;
+					
+				// Save relation data
+				$db_relations[ $row->parent ][ $child_relation ] = $row;
+			}
+			
+			// Create code generator instance
+			$g = new Generator('samson\activerecord');
+			$g->multicomment(array('Static ActiveRecord generated table relations'));	
+			
+			// Array of "FROM" sql statements for related tables
+			$sql_from = array();
+				
+			// Array of "SELECT" sql statements for related tables
+			$sql_select = array();
+				
+			// Array related tables columns names and aliases
+			$relations = array();			
+			
+			// Array of table aliases
+			$aliases = array();
+			
+			// Array of table relation type
+			$types = array();
+			
+			// Array of columns map
+			$map = array();					
+			
+			// Iterate grouped relations
+			foreach ( $db_relations as $parent => $relation )
+			{				
+				// Iterate table permanent relations
+				foreach ( $relation as $r_table => $i )
+				{			
+					// Array of "SELECT" sql statements for this related tables
+					$_sql_select = array();
+					
+					// Array related tables columns names and aliases for this related tables
+					$_relations = array();
+					
+					// Parent table name
+					$r_table_name = isset($i->alias{0}) ? $i->alias : $i->child;
+						
+					// Define start of join sql statement
+					$_sql_from = 'LEFT JOIN `'.$i->child.'`';
+					// If relation alias is defined
+					if( isset($i->alias{0})) $_sql_from = 'LEFT JOIN `'.$i->child.'` AS '.$i->alias;				
+												
+					// Parent table name
+					$ptable = $i->parent;
+						
+					// If parent field not specified - use parent table primary field
+					if( !isset($i->parent_field) ) $pfield = $primary_field;
+					// Correctly determine parent field name
+					else
+					{
+						// Define if parent field name has table name in it
+						$tableinpf = strpos( $i->parent_field, '.');
+			
+						// Get parent table field name
+						$pfield = $tableinpf !== false ? substr( $i->parent_field, $tableinpf + 1 ) : $i->parent_field;
+			
+						// Parent table field
+						$ptable = $tableinpf !== false ? substr( $i->parent_field, 0, $tableinpf ) : $i->parent;
+					}
+						
+					// If no "." symbol in parent field name append parent table name
+					$pf = '`'.$ptable.'`.`'.$pfield.'`';
+			
+					// If child field not specified
+					if( !isset($i->child_field{0})) $cf  =  '`'.$i->child.'`.`'.$pfield.'`';
+					// If no "." symbol in child field name append child table name
+					else $cf = strpos( $i->child_field, '.') === false ? '`'.(isset($i->alias{0})?$i->alias:$i->child).'`.'.$i->child_field : $i->child_field;
+			
+					// Build columns metadata
+					$this->__build_columns_map( $i->child, $_sql_select, $map, $_relations, $i->alias );				
+					
+					// Array of "SELECT" sql statements to all related tables
+					$sql_select[ $r_table_name ] = implode( ',',$_sql_select);
+					$relations[ $r_table_name ] = $_relations;		
+					$sql_from[ $r_table_name ] = $_sql_from.' ON '.$pf.' = '.$cf;
+					$aliases[ $r_table_name ] = $i->child;
+					$types[ $r_table_name ] = $i->type;		
+				}	
+				
+				// Generate code for this table
+				$g->newline()
+				->comment('Relation data for table "'.$parent.'"')
+				->defarraymerge( $parent.'::$_sql_from', $sql_from )
+				->defarraymerge( $parent.'::$_sql_select', $sql_select )
+				->defarraymerge( $parent.'::$_map', $map )
+				->defvar( $parent.'::$_relation_alias', $aliases )
+				->defvar( $parent.'::$_relation_type', $types )
+				->defvar( $parent.'::$_relations', $relations );
+			}
+			
+			// Save file to wwwrot
+			$g->write( $relations_file );	
+
+			// Evaluate relations code
+			eval($g->code);
+		} 
+		// Or just include file
+		else include( $relations_file );	
+	}
+	
 	/**
 	 * Generate ORM classes 
 	 * @param string $force Force class generation
@@ -392,22 +548,8 @@ class dbMySQLConnector implements idbConnector
 	public function generate( $force = false )
 	{		
 		// Processed permanent table relations
-		$db_relations = array();	
-		
-		// Iterate permanent relations
-		foreach( TableRelation::$instances as $row )
-		{
-			// Create relations data for specific table
-			if( ! isset( $db_relations[ $row->parent ] ) ) $db_relations[ $row->parent ] = array();
-			
-			// Define child relation table name
-			$child_relation = !isset($row->alias{0}) ? $row->child : $row->alias;
-			
-			// Save relation data
-			$db_relations[ $row->parent ][ $child_relation ] = $row;
-		}		
+		$db_relations = array();			
 	
-		//trace($db_relations);
 		// Получим описание относительных таблиц
 		$db_mapper = $this->mapper();	
 		
@@ -428,10 +570,10 @@ class dbMySQLConnector implements idbConnector
 			
 			// Запишем описание каждой колонки таблиц в специальный массив
 			self::$tables[ $table_name ][] = $row;	
-		}
-	
-		$bstr = serialize(self::$tables);
+		}	
+		
 		$bstr = md5(serialize(self::$tables));
+		
 		// Создадим имя файла содержащего пути к модулям
 		$md5_file = getcwd().'/.'.$bstr.'.db_classes.dbs';
 		$md5_file_func = getcwd().'/.'.$bstr.'.db_func.dbs';

@@ -343,12 +343,18 @@ class dbQuery implements idbQuery
 	/** @see idbQuery::group_by() */
 	public function group_by( $field )
 	{
-		$this->group[] = $field;
+		// Default grouping array
+		$destination = & $this->group;
+		
+		// If this field belongs to query main class
+		if (property_exists( $this->class_name, $field )) $destination = & $this->own_group;
+		
+		$destination[] = $field;
 	
 		// Вернем себя для цепирования
 		return $this;
 	}
-	
+		
 	/** @see idbQuery::limit() */
 	public function limit( $st, $en = NULL )
 	{

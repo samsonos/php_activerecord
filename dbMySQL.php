@@ -641,7 +641,11 @@ class dbMySQL extends dbMySQLConnector implements idb
 				dbRecord::$instances[ $class_name ][ $main_id ] = $main_obj;
 			}
 			// Получим объект из локального кеша
-			else $main_obj = dbRecord::$instances[ $class_name ][ $main_id ]; 			
+			else 
+			{
+				//elapsed('object from cache:'.$class_name.'-'.$main_id);
+				$main_obj = & dbRecord::$instances[ $class_name ][ $main_id ]; 			
+			}
 			
 			// Коллекция связанных 1-1 объектов
 			$onetoone = array();

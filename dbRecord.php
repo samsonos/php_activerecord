@@ -139,14 +139,15 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	 */
 	public function save()
 	{			
-		
 		// Если данный объект еще привязан к записи в БД - выполним обновление записи в БД		
 		if( $this->attached ) db()->update( $this->class_name, $this );	
 		// Иначе создадим новую запись с привязкой к данному объекту
 		else $this->create();
+				
+		//elapsed('saving to cache:'.get_class($this).'-'.$this->id);		
 		
 		// Обновим указатель на текущую запись в локальном кеше АктивРекорд
-		self::$instances[ $this->class_name ][ $this->id ] = & $this;
+		self::$instances[ ns_classname(get_class($this),'') ][ $this->id ] = & $this;
 	}
 	
 	/**	@see idbRecord::delete() */

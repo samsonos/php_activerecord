@@ -723,16 +723,16 @@ class dbMySQL extends dbMySQLConnector implements idb
 								//trace('  '.$field.'('.$lc_field.')->'.$db_inner_row[ $lc_field ]);
 								
 								$r_obj->$field = $db_inner_row[ $lc_field ];				
-							}
-							
-							// Call handler for object filling
-							$r_obj->filled();
+							}					
 							
 							// Зафиксируем данный класс в локальном кеше
 							dbRecord::$instances[ $join_name ][ $r_obj_id ] = $r_obj;
 						}
 						// Получим объект из локального кеша
-						else $r_obj = dbRecord::$instances[ $join_name ][ $r_obj_id ];						
+						else $r_obj = dbRecord::$instances[ $join_name ][ $r_obj_id ];
+
+						// Call handler for object filling
+						$r_obj->filled();
 						
 						// Если связанный объект привязан как один-к-одному - просто довами ссылку на него
 						if( $_relation_type[ $join_table ] == 0 ) 

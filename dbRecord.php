@@ -191,7 +191,10 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		}
 		
 		// Переберем связанные 1-1 классы
-		foreach ( $this->onetoone as $name => $obj ) $values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
+		foreach ( $this->onetoone as $name => $obj ) 
+		{
+			if(is_object($obj))	$values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
+		}
 		
 		// Вернем массив атрибутов представляющий запись БД
 		return $values;

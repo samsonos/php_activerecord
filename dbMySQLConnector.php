@@ -1,6 +1,5 @@
 <?php 
 namespace samson\activerecord;
-use samson\core\File;
 
 /**
  * Класс описывающий подключение к серверу MySQL
@@ -77,6 +76,7 @@ class dbMySQLConnector implements idbConnector
 		}
 	}
 	
+	//[PHPCOMPRESSOR(remove,start)]
 	/**
 	 * Генератор описания классов и функций для работы с таблицами БД
 	 *
@@ -582,7 +582,7 @@ class dbMySQLConnector implements idbConnector
 		if ( !file_exists( $md5_file ) || $force )
 		{
 			// Удалим все файлы с расширением map
-			foreach ( File::dir( getcwd(), 'dbs' ) as $file ) unlink( $file );		
+			foreach ( \samson\core\File::dir( getcwd(), 'dbs' ) as $file ) unlink( $file );		
 		
 			// Если еще не создан отпечаток базы данных - создадим его
 		
@@ -626,8 +626,17 @@ class dbMySQLConnector implements idbConnector
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see idbConnector::mapper()
+	 * Установить специальный режим работы - "Маппинг"
+	 * При таком режиме работы БД вся информация о таблицах и все
+	 * данные этих таблиц физически размещаются в одной таблице БД,
+	 * но для разработчика этот факт остается прозрачным а все подмены
+	 * выполняются на уровне ActiveRecord.
+	 * Такой подход дает универсальность в обработке данных таких таблиц
+	 * и экономит огрмное количество кода и веремени при создании/управлении
+	 * различными сущностями.
+	 *
+	 * @param string $mapper_table Имя таблицы в БД, которая хранит все данные
+	 * @param string $mapper_id Идентификатор сущности описывающий структуры таблиц
 	 */
 	public function mapper( $mapper_table = 'scmstable', $mapper_id='Headers' )
 	{
@@ -712,7 +721,8 @@ class dbMySQLConnector implements idbConnector
 		}
 		return self::$tables;
 	}
-		
+	//[PHPCOMPRESSOR(remove,end)]
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see idbConnector::connect()

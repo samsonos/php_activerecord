@@ -1,8 +1,5 @@
 <?php
 namespace samson\activerecord;
-
-use samson\core\File;
-
 use samson\core\CompressableExternalModule;
 
 class ActiveRecordConnector extends CompressableExternalModule
@@ -90,8 +87,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 			'host' =>  $this->host
 		));	
 
-		//[PHPCOMPRESSOR(remove,start)]
-		
+		//[PHPCOMPRESSOR(remove,start)]		
 		// Generate table relations
 		db()->relations();
 		//[PHPCOMPRESSOR(remove,end)]

@@ -175,7 +175,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	 * @see iModuleViewable::toView()
 	 */
 	public function toView( $prefix = NULL, array $restricted = array() )
-	{
+	{		
 		// Результирующая коллекция значенией атрибутов записи
 		// Добавим в неё универсальное поле - идентификатор
 		$values = array( $prefix.'id' => $this->id );	
@@ -188,7 +188,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		{			
 			// Если это не системное поле записи - запишем его значение
 			if( ! in_array( $var, $restricted ) ) $values[ $prefix.$var ] = $value;	
-		}
+		}	
 		
 		// Переберем связанные 1-1 классы
 		foreach ( $this->onetoone as $name => $obj ) 

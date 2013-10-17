@@ -730,7 +730,7 @@ class dbMySQLConnector implements idbConnector
 	public function connect( array $params = NULL )
 	{
 		//elapsed('Подключение к БД');	
-		
+
 		// Получим необходимые параметры
 		$host 	= (!isset($params['host'])) ? 'localhost' : $params['host'];
 		$login 	= (!isset($params['login'])) ? 'root' : $params['login'];

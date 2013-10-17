@@ -424,7 +424,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		
 		// Добавим нужные групировщики
 		$query->own_group = array_merge( $params['_own_group'], is_array($query->own_group) ? $query->own_group : array() );
-		if( sizeof( $query->own_group )) $from .= 'GROUP BY '.implode(',', $query->own_group);
+		if( sizeof( $query->own_group )) $from .= "\n".'GROUP BY '.implode(',', $query->own_group);
 		// Если указана сортировка результатов
 		if( sizeof( $query->own_order )) $from .= "\n".' ORDER BY '.$query->own_order[0].' '.$query->own_order[1];
 		// Если нужно ограничить к-во записей в выдаче по главной таблице

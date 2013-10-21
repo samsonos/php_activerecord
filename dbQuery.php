@@ -49,6 +49,12 @@ class dbQuery implements idbQuery
 	/** Sorting filter for base table */
 	public $own_order;
 	
+	/** Virtual field for base table */
+	public $own_virtual_fields = array();
+	
+	/** Virtual fields */
+	public $virtual_fields = array();
+	
 	/**
 	 * Коллекция условных групп для запроса 
 	 * @var dbConditionGroup
@@ -79,11 +85,7 @@ class dbQuery implements idbQuery
 	 */
 	public $join = array();	
 	
-	/**
-	* Коллекция дополнительных произвольных полей для запроса
-	* @var array
-	*/
-	public $virtual_fields = array();
+
 	
 	/** Query handlers stack */
 	protected $stack = array();
@@ -331,13 +333,6 @@ class dbQuery implements idbQuery
 	
 		// Вернем себя для цепирования
 		return $this;
-	}	
-	
-	/** @see idbQuery::join() */
-	public function join2( $entity, $entity_field = null, $own_field = null, $alias = null )
-	{
-		// Добавим имя класса в коллекцию присоединения
-		$this->join[] = new RelationData2( $this->class_name, $entity, $entity_field, $own_field, $alias );
 	}
 	
 	/** @see idbQuery::group_by() */
@@ -374,14 +369,15 @@ class dbQuery implements idbQuery
 	}
 	
 	/** @see idbQuery::add_field() */
-	public function add_field( $field, $alias = NULL )
+	public function add_field( $field, $alias = NULL, $own = true )
 	{
 		// Если передан псевдоним для поля, то подставим его
 		if ( isset($alias) ) $field = $field.' as '.$alias;
 		else $alias = $field;
 		
 		// Добавим виртуальное поле
-		$this->virtual_fields[ $alias ] = $field;
+		if($own) $this->own_virtual_fields[ $alias ] = $field;
+		else $this->virtual_fields[ $alias ] = $field;
 	
 		// Вернем себя для цепирования
 		return $this;

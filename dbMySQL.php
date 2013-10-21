@@ -241,7 +241,10 @@ class dbMySQL extends dbMySQLConnector implements idb
 		//trace($query->virtual_fields);
 		
 		// Выполним запрос к БД и создадим объекты
-		if ( ( is_array( $db_data ) ) && ( sizeof($db_data) > 0 ) ) $result = $this->toRecords( $class_name, $db_data, $query->join, $query->virtual_fields );
+		if ( ( is_array( $db_data ) ) && ( sizeof($db_data) > 0 ) ) 
+		{
+			$result = $this->toRecords( $class_name, $db_data, $query->join, array_merge( $query->own_virtual_fields, $query->virtual_fields) );
+		}
 	
 		// Вернем коллекцию полученных объектов
 		return $result;
@@ -366,6 +369,9 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Текст выборки полей
 		$select = $_table_name.'.*';//$_sql_select['this'];
 		
+		// If virtual fields defined
+		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
+		
 		$from = ' ( '.$this->prepareInnerSQL( $class_name, $query, $params );
 		
 		// Добавим алиас
@@ -410,17 +416,19 @@ class dbMySQL extends dbMySQLConnector implements idb
 	
 	private function prepareInnerSQL( $class_name, dbQuery $query, $params )
 	{
+		//trace($class_name);
+		//print_r($query->own_condition);
 		// Получим текст цели запроса
 		$from = 'SELECT '.$params['_sql_select']['this'];
 		
 		// Если заданны виртуальные поля, добавим для них колонки
-		if( sizeof( $query->virtual_fields ) ) $from .= ', '."\n".implode("\n".', ', $query->virtual_fields);
+		if( sizeof( $query->own_virtual_fields ) ) $from .= ', '."\n".implode("\n".', ', $query->own_virtual_fields);
 		
 		// From part
 		$from .="\n".' FROM '.$params['_sql_from']['this'];
 		
 		// Если существуют условия для главной таблицы в запросе - получим их
-		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE '.$this->getConditions($query->own_condition, $class_name);
+		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE ('.$this->getConditions($query->own_condition, $class_name).')';
 		
 		// Добавим нужные групировщики
 		$query->own_group = array_merge( $params['_own_group'], is_array($query->own_group) ? $query->own_group : array() );

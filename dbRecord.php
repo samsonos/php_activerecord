@@ -36,13 +36,6 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	public $class_name;
 	
 	/**
-	 * Коллекция атрибутов объекта 
-	 * Она соответствует значениям ячеек записи из БД
-	 * @var array
-	 */
-	//public $_data = array();	
-	
-	/**
 	 * Коллекция связанных объектов один к одному
 	 * @var array
 	 */
@@ -191,9 +184,9 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		}	
 		
 		// Переберем связанные 1-1 классы
-		foreach ( $this->onetoone as $name => $obj ) 
+		//foreach ( $this->onetoone as $name => $obj ) 
 		{
-			if(is_object($obj))	$values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
+			//if(is_object($obj))	$values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
 		}
 		
 		// Вернем массив атрибутов представляющий запись БД

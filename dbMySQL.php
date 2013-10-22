@@ -20,6 +20,13 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 * @var integer
 	 */
 	private $elapsed = 0;
+	
+	/** Show hide query debug information */
+	public function debug( $flag = true )
+	{
+		if( $flag ) $_SESSION['__AR_SHOW_QUERY__'] = true;
+		else unset($_SESSION['__AR_SHOW_QUERY__']);
+	}
 
 	/**
 	 * @see idb::simple_query()

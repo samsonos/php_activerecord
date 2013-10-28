@@ -7,26 +7,7 @@ namespace samson\activerecord;
  * @author Nikita Kotenko <nick.w2r@gmail.com>
  *
  */
-class dbConditionGroup
+class dbConditionGroup extends Condition
 {
-	/**
-	 * Коллекция аргументов условия группы
-	 * @var array
-	 * @see dbConditionArgument
-	 */
-	public $arguments = array();
 	
-	/**
-	 * Отношение между аргументами в условной группе
-	 * @var string
-	 */
-	public $relation = 'AND';	
-	
-	/**
-	 * Конструктор
-	 * 
-	 * @param string $relation Условное отношение данной группы к другим группам	
-	 */
-	public function __construct( $relation = NULL ){ if( isset($relation) ) $this->relation = $relation; }
 }
-?>

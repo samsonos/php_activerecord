@@ -9,7 +9,7 @@ use samson\core\iModuleViewable;
  * @author Nikita Kotenko <nick.w2r@gmail.com>
  *
  */
-class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
+class dbRecord extends Record implements idbRecord
 {	
 	/**
 	 * Коллекция экземпляров данного класса
@@ -17,11 +17,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 	 */
 	public static $instances = array();
 	
-	/**
-	 * Коллекция системых полей которые не учавствуют в преобразовании записи в массив
-	 * @var array
-	 */
-	public static $restricted = array( '_data', 'attached', 'onetoone', 'onetomany', 'class_name' );
+	
 	
 	/**
 	 * Уникальный идентификатор объекта
@@ -156,42 +152,7 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		
 	}
 
-	/**
-	 * Создаваемый массив формируется из всех внутренних полей объекта-записи БД
-	 * с учетом переданного префикса:
-	 * 	<code>array( $prefix.FIELD => FIELD_VALUE</code>
-	 *
-	 * Если объект-запись БД имеет связи с другими объектами-записями БД
-	 * то они также будут преобразованы и добавлены в создаваемый массив но с использованием
-	 * специальных ключей:
-	 * 	<code>array( $prefix.SUB_CLASS.$prefix.SUB_CLASS_FIELD => SUB_CLASS_FIELD_VALUE</code>
-	 * @see iModuleViewable::toView()
-	 */
-	public function toView( $prefix = NULL, array $restricted = array() )
-	{		
-		// Результирующая коллекция значенией атрибутов записи
-		// Добавим в неё универсальное поле - идентификатор
-		$values = array( $prefix.'id' => $this->id );	
-
-		// Учтем поля которые не нужно превращать в массив
-		$restricted = array_merge( self::$restricted, $restricted );		
-		
-		// Пробежимся по переменным класса
-		foreach( get_object_vars( $this ) as $var => $value ) 
-		{			
-			// Если это не системное поле записи - запишем его значение
-			if( ! in_array( $var, $restricted ) ) $values[ $prefix.$var ] = $value;	
-		}	
-		
-		// Переберем связанные 1-1 классы
-		//foreach ( $this->onetoone as $name => $obj ) 
-		{
-			//if(is_object($obj))	$values = array_merge( $values, $obj->toView( $prefix.classname( get_class($obj)).'_' ));		
-		}
-		
-		// Вернем массив атрибутов представляющий запись БД
-		return $values;
-	}
+	
 	
 	/**
 	 * Обработчик клонирования записи
@@ -210,10 +171,6 @@ class dbRecord implements idbRecord, iModuleViewable, \ArrayAccess
 		$this->save();
 	}
 	
-	/** ArrayAccess methods */
-	public function offsetSet( $offset, $value ){ $this->$offset = $value; }
-	public function offsetGet($offset)			{ return $this->$offset;  }
-	public function offsetUnset($offset){ unset( $this->$offset ); }
-	public function offsetExists($offset){ return property_exists( $this, $offset ); }	
+		
 
 }

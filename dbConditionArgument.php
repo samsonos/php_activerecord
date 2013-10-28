@@ -7,26 +7,8 @@ namespace samson\activerecord;
  * @author Nikita Kotenko <nick.w2r@gmail.com>
  *
  */
-class dbConditionArgument
-{
-	/**
-	 * Имя поля БД к которому относится данный аргумент
-	 * @var string
-	 */
-	public $field = '';
-	
-	/**
-	 * Значение аргумента в условии запроса
-	 * @var mixed
-	 */
-	public $value;
-	
-	/**
-	 * Отношение между полем условия и его аргументом
-	 * @var dbRelation
-	 */
-	public $relation = dbRelation::EQUAL;
-	
+class dbConditionArgument extends Argument
+{	
 	/**
 	 * Конструктор
 	 * 
@@ -35,14 +17,7 @@ class dbConditionArgument
 	 */
 	public function __construct( $field, $value, $relation = NULL )
 	{		
-		// Установим поле условия
-		$this->field = $field;
-		
-		// Установим значение поля условия
-		$this->value = $value;
-		
-		// Установим отношение
-		$this->relation = !isset($relation) ? dbRelation::EQUAL : $relation;	
+		parent::__construct( $field, $value, $relation );	
 		
 		// Попытаемя розпарсить отношение из поля условия
 		if( preg_match('/_(?<relation>gte|lte|gt|eq|ne|lt|like)_?/iu', $field, $relation_match ) )

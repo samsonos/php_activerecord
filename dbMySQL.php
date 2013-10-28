@@ -193,40 +193,16 @@ class dbMySQL extends dbMySQLConnector implements idb
 	
 	/** Count query result */
 	public function innerCount( $class_name, dbQuery $query )
-	{
+	{		
 		$params = $this->__get_table_data( $class_name );
-		// Получим переменные для запроса
-		extract($params);
-			
-		// Текст выборки полей
-		$select = $_table_name.'.*';//$_sql_select['this'];
-		
-		// Получим текст цели запроса
-		$from = 'SELECT '.$_sql_select['this'];
-		
-		//trace($_sql_select['this']);
-		
-		// Если заданны виртуальные поля, добавим для них колонки
-		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
-		
-		// From part
-		$from .="\n".' FROM '.$_sql_from['this'];
-		
-		// Если существуют условия для главной таблицы в запросе - получим их
-		if( sizeof( $query->own_condition->arguments )) $from .= "\n".' WHERE '.$this->getConditions($query->own_condition, $class_name);
-		
-		// Добавим нужные групировщики
-		$query->own_group = array_merge( $_own_group, is_array($query->own_group) ? $query->own_group : array() );
-		if( sizeof( $query->own_group )) $from .= 'GROUP BY '.implode(',', $query->own_group);
-		// Если указана сортировка результатов
-		if( sizeof( $query->own_order )) $from .= "\n".' ORDER BY '.$query->own_order[0].' '.$query->own_order[1];
-		// Если нужно ограничить к-во записей в выдаче по главной таблице
-		if( sizeof( $query->own_limit )) $from .= "\n".' LIMIT '.$query->own_limit[0].(isset($query->own_limit[1])?','.$query->own_limit[1]:'');
-			
+	
 		// Get SQL
-		$sql = 'SELECT Count(*) as __Count FROM ('.$this->prepareInnerSQL($class_name, $query, $params).') as __table';
+		$sql = 'SELECT Count(*) as __Count FROM ('.$this->prepareInnerSQL( $class_name, $query, $params).') as __table';
+		
 		// Выполним запрос к БД
+		//$this->debug();		
 		$db_data = $this->query( $sql );
+		//$this->debug(false);
 			
 		return $db_data[0]['__Count'];
 	}
@@ -488,7 +464,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		extract($this->__get_table_data( $class_name ));
 	
 		// Получим "правильное" имя аттрибута сущности и выделим постоянную часть условия
-		$sql_cond_t = isset( $_map[ $arg->field ] ) ? $_map[ $arg->field ] : '';
+		$sql_cond_t = isset( $_map[ $arg->field ] ) ? $_map[ $arg->field ] : $arg->field;
 	
 		// Если аргумент условия - это НЕ массив - оптимизации по более частому условию
 		if( !is_array( $arg->value ) ) 

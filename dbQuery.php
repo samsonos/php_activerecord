@@ -12,14 +12,8 @@ namespace samson\activerecord;
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com> 
  *
  */
-class dbQuery implements idbQuery
-{
-	/**
-	 * Имя класса для которого выполняется запрос к БД
-	 * @var string
-	 */
-	public $class_name;
-	
+class dbQuery extends Query //implements idbQuery 
+{	
 	/**
 	 * Указатель на текущую группу условий с которой работает запрос
 	 *
@@ -93,56 +87,133 @@ class dbQuery implements idbQuery
 	/** Query parameters stack */
 	protected $params = array();
 	
-	/**
-	 * Universal handler to pass to CMSMaterial::get()	 *
-	 * @param samson\activerecord\dbQuery $db_query Original db query object for modifiyng
-	 *
-	 */
-	protected function __handler()
-	{
-		// Iterate handlers and run them
-		foreach ( $this->stack as $i => $handler )
-		{
-			// Create handler params array with first parameter pointing to this query object			
-			$params = array( &$this );		
+// 	/**
+// 	 * Universal handler to pass to CMSMaterial::get()	 *
+// 	 * @param samson\activerecord\dbQuery $db_query Original db query object for modifiyng
+// 	 *
+// 	 */
+// 	protected function __handler()
+// 	{
+// 		// Iterate handlers and run them
+// 		foreach ( $this->stack as $i => $handler )
+// 		{
+// 			// Create handler params array with first parameter pointing to this query object			
+// 			$params = array( &$this );		
 
-			// Combine params with existing ones in one array
-			$params = array_merge( $params, $this->params[ $i ] ); 			
+// 			// Combine params with existing ones in one array
+// 			$params = array_merge( $params, $this->params[ $i ] ); 			
 			
-			// Append this query object as first handler parameter
-			//array_unshift( $this->params[ $i ] , & $this );			
+// 			// Append this query object as first handler parameter
+// 			//array_unshift( $this->params[ $i ] , & $this );			
 			
-			//trace($this->params[ $i ]);
-			call_user_func_array( $handler, $params );
-		}
-	}
+// 			//trace($this->params[ $i ]);
+// 			call_user_func_array( $handler, $params );
+// 		}
+// 	}
 	
-	/**
-	 * Add query handler
-	 * @param callable $callable External handler
-	 * @return samson\activerecord\dbQuery
-	 */
-	public function handler( $callable )
-	{
-		// If normal handler is passed
-		if( is_callable( $callable ) )
-		{
-			// Add handler
-			$this->stack[] = $callable;
+// 	/**
+// 	 * Add query handler
+// 	 * @param callable $callable External handler
+// 	 * @return samson\activerecord\dbQuery
+// 	 */
+// 	public function handler( $callable )
+// 	{
+// 		// If normal handler is passed
+// 		if( is_callable( $callable ) )
+// 		{
+// 			// Add handler
+// 			$this->stack[] = $callable;
 	
-			// Get passed arguments
-			$args = func_get_args();
+// 			// Get passed arguments
+// 			$args = func_get_args();
 	
-			// Remove first argument
-			array_shift( $args );
+// 			// Remove first argument
+// 			array_shift( $args );
 	
-			// Add handler parameters stack
-			$this->params[] = & $args;
-		}
-		else e('Cannot set CMS Query handler - function(##) does not exists', E_SAMSON_CMS_ERROR, $callable );
+// 			// Add handler parameters stack
+// 			$this->params[] = & $args;
+// 		}
+// 		else e('Cannot set CMS Query handler - function(##) does not exists', E_SAMSON_CMS_ERROR, $callable );
 		 
-		return $this;
-	}
+// 		return $this;
+// 	}
+
+	// 	/** @see idbQuery::fields() */
+	// 	public function fields( $field_name, & $return_value = null )
+	// 	{
+	// 		// Call handlers stack
+	// 		$this->_callHandlers();
+		
+	// 		// Iterate records and gather specified field
+	// 		$return_value = array();
+	// 		foreach ( db()->find( $this->class_name, $this ) as $record ) $return_value[] =  $record->$field_name;
+		
+	// 		// Clear this query
+	// 		$this->flush();
+	
+	// 		// Method return value
+	// 		$return = null;
+	
+	// 		// If return value is passed - return boolean about request results
+	// 		if( func_num_args() > 1 ) $return = (is_array( $return_value ) && sizeof( $return_value ));
+	// 		// Set request results as return value
+	// 		else $return = & $return_value;
+	
+	// 		// Otherwise just return request results
+	// 		return $return;
+	// 	}
+	
+	// 	/** @see idbQuery::get() */
+	// 	public function & exec( & $return_value = null)
+	// 	{
+	// 		// Call handlers stack
+	// 		$this->_callHandlers();
+	
+	// 		// Perform DB request
+	// 		$return_value = db()->find( $this->class_name, $this );
+	
+	// 		// Clear this query
+	// 		$this->flush();
+	
+	// 		// Method return value
+	// 		$return = null;
+	
+	// 		// If return value is passed - return boolean about request results
+	// 		if( func_num_args() ) $return = (is_array( $return_value ) && sizeof( $return_value ));
+	// 		// Set request results as return value
+	// 		else $return = & $return_value;
+	
+	// 		// Otherwise just return request results
+	// 		return $return;
+	// 	}
+	
+	// 	/** @see idbQuery::first() */
+	// 	public function & first( & $return_value = null)
+	// 	{
+	// 		// Call handlers stack
+	// 		$this->_callHandlers();
+	
+	// 		// Выполним запрос к БД
+	// 		$return_value = db()->find( $this->class_name, $this );
+	
+	// 		// Получим первую запись из полученного массива, если она есть
+	// 		$return_value = isset( $return_value[0] ) ? $return_value[0] : null;
+		
+	// 		// Очистим запрос
+	// 		$this->flush();
+	
+	// 		// Локальная переменная для возврата правильного результата
+	// 		$return = null;
+	
+	// 		// Если хоть что-то передано в функцию - запишем в локальную переменную boolean значение
+	// 		// которое покажет результат выполнения запроса к БД
+	// 		if( func_num_args() ) $return = isset( $return_value );
+	// 		// Сделаем копию полученных данных в локальную переменную
+	// 		else $return = & $return_value;
+	
+	// 		// Вернем значение из локальной переменной
+	// 		return $return;
+	// 	}
 	 
 	/** */
 	public function own_limit( $st, $en = NULL ){ $this->own_limit = array($st, $en ); return $this; }
@@ -151,7 +222,7 @@ class dbQuery implements idbQuery
 	public function own_group_by( $params ){ $this->own_group[] = $params; return $this; }
 	
 	/** */
-	public function own_order_by( $params ){ $this->own_order = $params; return $this; }
+	public function own_order_by( $field, $direction = 'ASC' ){ $this->own_order = array($field,$direction); return $this; }
 	
 	/** @see idbQuery::flush() */
 	public function flush()
@@ -179,83 +250,7 @@ class dbQuery implements idbQuery
 		// Correctly perform db request for multiple data
 		return func_num_args() ? $this->exec( $return_value ) : $this->exec();		
 	}
-	
-	/** @see idbQuery::fields() */
-	public function fields( $field_name, & $return_value = null )
-	{
-		// Call handlers stack
-		$this->__handler();
-			
-		// Iterate records and gather specified field
-		$return_value = array();
-		foreach ( db()->find( $this->class_name, $this ) as $record ) $return_value[] =  $record->$field_name;
-			
-		// Clear this query
-		$this->flush();			
-		
-		// Method return value
-		$return = null;
-		
-		// If return value is passed - return boolean about request results
-		if( func_num_args() > 1 ) $return = (is_array( $return_value ) && sizeof( $return_value ));
-		// Set request results as return value
-		else $return = & $return_value;
-				
-		// Otherwise just return request results
-		return $return;	
-	}
-	
-	/** @see idbQuery::get() */
-	public function & exec( & $return_value = null)
-	{		
-		// Call handlers stack
-		$this->__handler();
-		
-		// Perform DB request
-		$return_value = db()->find( $this->class_name, $this );		
-		
-		// Clear this query
-		$this->flush();			
-		
-		// Method return value
-		$return = null;
-		
-		// If return value is passed - return boolean about request results
-		if( func_num_args() ) $return = (is_array( $return_value ) && sizeof( $return_value ));
-		// Set request results as return value
-		else $return = & $return_value;
-				
-		// Otherwise just return request results
-		return $return;	
-	}
-	
-	/** @see idbQuery::first() */
-	public function & first( & $return_value = null)
-	{
-		// Call handlers stack
-		$this->__handler();
-		
-		// Выполним запрос к БД
-		$return_value = db()->find( $this->class_name, $this );		
-				
-		// Получим первую запись из полученного массива, если она есть
-		$return_value = isset( $return_value[0] ) ? $return_value[0] : null;			
-			
-		// Очистим запрос
-		$this->flush();
-		
-		// Локальная переменная для возврата правильного результата
-		$return = null;
-		
-		// Если хоть что-то передано в функцию - запишем в локальную переменную boolean значение
-		// которое покажет результат выполнения запроса к БД
-		if( func_num_args() ) $return = isset( $return_value );	
-		// Сделаем копию полученных данных в локальную переменную
-		else $return = & $return_value;			
-		
-		// Вернем значение из локальной переменной
-		return $return;
-	}
+
 		
 	/**
 	 * @see idbQuery::or_() 
@@ -304,7 +299,7 @@ class dbQuery implements idbQuery
 	{			
 		// Установим общую группу условий
 		$destination = & $this->cConditionGroup;	
-		
+		 
 		// Если передана строка как атрибут
 		if( is_string( $attribute ) ) 	
 		{
@@ -315,11 +310,27 @@ class dbQuery implements idbQuery
 			if (property_exists( $this->class_name, $attribute->field )) 
 			{
 				$destination = & $this->own_condition;
-			}
+			}			
+
+			// Добавим аргумент условия в выбранную группу условий
+			$destination->arguments[] = $attribute;
 		}				
-		
-		// Добавим аргумент условия в выбранную группу условий
-		$destination->arguments[] = $attribute;
+		// If condition group is passed
+		else if( is_a( $attribute, ns_classname('dbConditionGroup')) )
+		{			
+			// Iterate condition arguments
+			foreach ( $attribute->arguments as $arg ) 
+			{				
+				// TODO: add recursion as argument can be an condition group
+				// If base query table has this attribute - use base table condition collection
+				if( property_exists( $this->class_name, $arg->field )) $destination = & $this->own_condition;
+				// Else use query conditions collection			
+				else $destination = & $this->cConditionGroup;	
+				
+				// Add condition argument to defined destination
+				$destination->arguments[] = $attribute;
+			}
+		}		
 		
 		// Вернем себя для цепирования
 		return $this;
@@ -351,9 +362,11 @@ class dbQuery implements idbQuery
 	}
 		
 	/** @see idbQuery::limit() */
-	public function limit( $st, $en = NULL )
+	public function limit( $st, $en = NULL, $own = false )
 	{
-		$this->limit = array( $st, $en );
+		// Select base table or whole query destination
+		if($own) $this->own_limit = array( $st, $en );
+		else $this->limit = array( $st, $en );	
 	
 		// Вернем себя для цепирования
 		return $this;

@@ -1,6 +1,9 @@
 <?php 
 namespace samson\activerecord;
 
+use samson\core\Generator;
+use samson\core\File;
+
 /**
  * Класс описывающий подключение к серверу MySQL
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
@@ -420,11 +423,19 @@ class dbMySQLConnector implements idbConnector
 	public function relations()
 	{
 		// Generate unique file name
-		$relations_file = '.'.md5(serialize(TableRelation::$instances)).'.db_relations.dbs';
-		
+		$relations_file = __SAMSON_CACHE_PATH.'/db/relations/'.md5(serialize(TableRelation::$instances)).'.php';
+				
 		// Relations file does not exists - create it
 		if( !file_exists($relations_file))
 		{		
+			// Get directory path
+			$dir = pathname( $relations_file );
+			
+			// Create folder
+			if( ! file_exists( $dir )) mkdir( $dir, 0777, TRUE );
+			//  Clear folder
+			else File::clear( $dir );
+			
 			// Processed permanent table relations
 			$db_relations = array();
 			
@@ -575,14 +586,22 @@ class dbMySQLConnector implements idbConnector
 		$bstr = md5(serialize(self::$tables));
 		
 		// Создадим имя файла содержащего пути к модулям
-		$md5_file = getcwd().'/.'.$bstr.'.db_classes.dbs';
-		$md5_file_func = getcwd().'/.'.$bstr.'.db_func.dbs';
-		
+		$md5_file = __SAMSON_CACHE_PATH.'/db/metadata/classes_'.$bstr.'.php';
+		$md5_file_func = __SAMSON_CACHE_PATH.'/db/metadata/func_'.$bstr.'.php';
+
 		// Если еще не создан отпечаток базы данных - создадим его
 		if ( !file_exists( $md5_file ) || $force )
 		{
+			// Get directory path
+			$dir = pathname( $md5_file );		
+			
+			// Create folder
+			if( ! file_exists( $dir )) mkdir( $dir, 0777, TRUE );
+			//  Clear folder
+			else File::clear( $dir );
+			
 			// Удалим все файлы с расширением map
-			foreach ( \samson\core\File::dir( getcwd(), 'dbs' ) as $file ) unlink( $file );		
+			//foreach ( \samson\core\File::dir( getcwd(), 'dbs' ) as $file ) unlink( $file );		
 		
 			// Если еще не создан отпечаток базы данных - создадим его
 		
@@ -606,18 +625,18 @@ class dbMySQLConnector implements idbConnector
 				$db_classes .= $file_full[0];
 				$db_func .= $file_full[1];
 			}
+			
+			// Запишем файл для IDE в корень проекта
+			file_put_contents( $md5_file, '<?php '.$db_classes.'?>' );
+			file_put_contents( $md5_file_func, '<?php '.$db_func.'?>' );
 					
 			// Подключим наш ХУК для АктивРекорда!!!!!
 			eval( $db_classes );	
 			eval( $db_func );
-			
-			// Запишем файл для IDE в корень проекта
-			file_put_contents($md5_file, '<?php '.$db_classes.'?>' );
-			file_put_contents($md5_file_func, '<?php '.$db_func.'?>' );			
 		}
 		// Иначе просто его подключим 
 		else 
-		{			
+		{				
 			include($md5_file);	
 			include($md5_file_func);
 		}

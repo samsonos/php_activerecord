@@ -251,7 +251,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$ret = null;
 		
 		// Если мы получили 1ю запись то вернем её
-		if( sizeof($db_records) >= 1 ) $ret = & array_shift($db_records);		
+		if( sizeof($db_records) >= 1 ) $ret = array_shift($db_records);		
 		
 		// Вернем переменную
 		return $ret;

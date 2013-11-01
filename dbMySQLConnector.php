@@ -12,6 +12,9 @@ use samson\core\File;
  */
 class dbMySQLConnector implements idbConnector
 {
+	/** Path to cache dir */
+	const CACHE_PATH = '/db/';
+	
 	/**
 	 * Коллекция данных описывающих таблицы в БД
 	 * @var array
@@ -423,7 +426,7 @@ class dbMySQLConnector implements idbConnector
 	public function relations()
 	{
 		// Generate unique file name
-		$relations_file = __SAMSON_CACHE_PATH.'/db/relations/'.md5(serialize(TableRelation::$instances)).'.php';
+		$relations_file = __SAMSON_CACHE_PATH.self::CACHE_PATH.'/relations/'.md5(serialize(TableRelation::$instances)).'.php';
 				
 		// Relations file does not exists - create it
 		if( !file_exists($relations_file))
@@ -466,7 +469,7 @@ class dbMySQLConnector implements idbConnector
 			$relations = array();			
 			
 			// Array of table aliases
-			$aliases = array();
+			$aliases = array();			
 			
 			// Array of table relation type
 			$types = array();
@@ -586,8 +589,8 @@ class dbMySQLConnector implements idbConnector
 		$bstr = md5(serialize(self::$tables));
 		
 		// Создадим имя файла содержащего пути к модулям
-		$md5_file = __SAMSON_CACHE_PATH.'/db/metadata/classes_'.$bstr.'.php';
-		$md5_file_func = __SAMSON_CACHE_PATH.'/db/metadata/func_'.$bstr.'.php';
+		$md5_file = __SAMSON_CACHE_PATH.self::CACHE_PATH.'metadata/classes_'.$bstr.'.php';
+		$md5_file_func = __SAMSON_CACHE_PATH.self::CACHE_PATH.'metadata/func_'.$bstr.'.php';
 
 		// Если еще не создан отпечаток базы данных - создадим его
 		if ( !file_exists( $md5_file ) || $force )

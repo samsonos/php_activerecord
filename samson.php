@@ -33,15 +33,28 @@ class ActiveRecordConnector extends CompressableExternalModule
 	/** @see \samson\core\CompressableExternalModule::afterCompress() */
 	public function afterCompress( & $obj = null, array & $code = null )
 	{	
+		// Build activerecord cache path
+		$cache_path = __SAMSON_CWD__.__SAMSON_CACHE_PATH.dbMySQLConnector::CACHE_PATH;
+				
 		// Iterate throug generated php code
-		foreach (\samson\core\File::dir( __SAMSON_CWD__, 'dbs', '', $r, 1 ) as $file)
+		foreach (\samson\core\File::dir( $cache_path.'metadata', 'php', '', $r, 1 ) as $file)
 		{	
 			// No namespace for global function file
 			$ns = strpos( $file, 'func') === false ? __NAMESPACE__ : '';			 
-				
+
+			// Compress generated php code
+			$obj->compress_php( $file, $this, $code, $ns );		
+		}		
+		
+		// Iterate throug generated php code
+		foreach (\samson\core\File::dir( $cache_path.'relations', 'php', '', $r, 1 ) as $file)
+		{
+			// No namespace for global function file
+			$ns = strpos( $file, 'func') === false ? __NAMESPACE__ : '';
+		
 			// Compress generated php code
 			$obj->compress_php( $file, $this, $code, $ns );
-		}		
+		}
 	}
 	
 	/** @see \samson\core\ExternalModule::prepare() */

@@ -755,7 +755,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 			$main_obj->filled();
 				
 			// Добавим созданный объект в результат
-			$collection[] = $main_obj;
+			$collection[ $main_obj->id ] = $main_obj;
 			
 			// Если внутренний цикл дошел до конца остановим главный цикл
 			if( $j == $records_count ) break;

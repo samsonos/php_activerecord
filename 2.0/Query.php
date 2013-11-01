@@ -87,12 +87,12 @@ class Query extends QueryHandler
 		$success = is_array( $result ) && $count;
 		
 		// Is amount of records is specified
-		if( isset( $limit ) )
+		if( isset( $limit ) && $success )
 		{	
 			// If we have not enought records - return null
 			if( $count < $limit ) $result = null;				
 			// If we need first record
-			else if( $limit === 1 ) $result = $result[0];
+			else if( $limit === 1 ) $result = array_shift($result);
 			// Slice array for nessesar amount
 			else if( $limit > 1 ) $result = array_slice( $result, 0, $limit );			
 		}	

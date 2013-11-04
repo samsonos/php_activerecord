@@ -87,7 +87,7 @@ class Query extends QueryHandler
 		$success = is_array( $result ) && $count;
 		
 		// Is amount of records is specified
-		if( isset( $limit ) && $success )
+		if( isset( $limit ) )
 		{	
 			// If we have not enought records - return null
 			if( $count < $limit ) $result = null;				

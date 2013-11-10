@@ -16,9 +16,15 @@ class ActiveRecordConnector extends CompressableExternalModule
 	 */
 	protected $requirements = array();
 	
+	/***/
+	public $prefix;
+	/***/
 	public $name;
-	public $login;
+	/***/
+	public $login = 'root';
+	/***/
 	public $pwd;
+	/***/
 	public $host = '127.0.0.1';
 	
 	/* Array of additional relations to set */
@@ -60,13 +66,16 @@ class ActiveRecordConnector extends CompressableExternalModule
 	/** @see \samson\core\ExternalModule::prepare() */
 	public function prepare()
 	{		
+		// Set table prefix
+		dbMySQLConnector::$prefix = $this->prefix;
+		
 		// Connect to database
 		db()->connect(array(
 			'name' => $this->name,
 			'login'=> $this->login,
 			'pwd' =>  $this->pwd,
 			'host' =>  $this->host
-		));	
+		));		
 		
 		// Create specific relations
 		foreach ( $this->relations as $args )
@@ -92,6 +101,9 @@ class ActiveRecordConnector extends CompressableExternalModule
 
 		//trace('AR:init');
 			
+		// Set table prefix
+		dbMySQLConnector::$prefix = $this->prefix;
+		
 		// Connect to database
 		db()->connect(array(
 			'name' => $this->name, 

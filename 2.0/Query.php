@@ -30,7 +30,7 @@ class Query extends QueryHandler
 	 * @param mixed $return External variable to store query results
 	 * @return mixed If no arguments passed returns query results collection, otherwise query success status
 	 */
-	public function exec( & $return = null){ return $this->execute( $return, func_num_args() ); }	
+	public function exec( & $return = null){ $args = func_num_args(); return $this->execute( $return, $args ); }	
 	
 	/**
 	 * Perform database request and get first record from results collection 
@@ -38,7 +38,7 @@ class Query extends QueryHandler
 	 * @param mixed $return External variable to store query results	 
 	 * @return mixed If no arguments passed returns query results first database record object, otherwise query success status
 	 */
-	public function first( & $return = null ){ return $this->execute( $return, func_num_args(), 1 ); }	
+	public function first( & $return = null ){ $args = func_num_args(); return $this->execute( $return, $args, 1 ); }	
 	
 	/**
 	 * Perform database request and get array of record field values
@@ -47,7 +47,7 @@ class Query extends QueryHandler
 	 * @param string $return		External variable to store query results	
 	 * @return Ambigous <boolean, NULL, mixed>
 	 */
-	public function fields( $field_name, & $return = null ){ return $this->execute( $return, func_num_args() - 1, null, array( $this, '_toFieldArray'), array($field_name) );  }	
+	public function fields( $field_name, & $return = null ){ $args = func_num_args() - 1; return $this->execute( $return, $args, null, array( $this, '_toFieldArray'), array($field_name) );  }	
 	
 	/**
 	 * Perform database request and return different results depending on function arguments.	 

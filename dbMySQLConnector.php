@@ -15,6 +15,9 @@ class dbMySQLConnector implements idbConnector
 	/** Path to cache dir */
 	const CACHE_PATH = '/db/';
 	
+	/** Table name prefix */
+	public static $prefix = '';
+	
 	/**
 	 * Коллекция данных описывающих таблицы в БД
 	 * @var array
@@ -101,6 +104,13 @@ class dbMySQLConnector implements idbConnector
 		// Сформируем имя функции для "вызова" класса
 		$func_name = __ARQ_Prefix__ . $class_name;			
 		
+		// If table name prefix is set
+		if(isset( self::$prefix{0} )) 
+		{
+			// Remove prefix from class name
+			$class_name = str_replace( self::$prefix, '', $class_name);			
+		}
+		
 		// Если такой класс не был описан вручную до этого
 		if( ! class_exists( $class_name, false ) && ! in_array( $class_name, $this->created_classes) )
 		{
@@ -108,7 +118,7 @@ class dbMySQLConnector implements idbConnector
 			$this->created_classes[] = $class_name;
 			
 			// Определим реальную таблицу БД
-			$table_name = isset($table_name) ? $table_name : $class_name;			
+			$table_name = isset($table_name) ? $table_name : self::$prefix.$class_name;			
 			
 			// Флаг того что этот класс относительный
 			$relational_class = $table_name != $class_name;
@@ -450,6 +460,9 @@ class dbMySQLConnector implements idbConnector
 					
 				// Define child relation table name
 				$child_relation = !isset($row->alias{0}) ? $row->child : $row->alias;
+				
+				$row->parent = self::$prefix.$row->parent;
+				$row->child = self::$prefix.$row->child;
 					
 				// Save relation data
 				$db_relations[ $row->parent ][ $child_relation ] = $row;
@@ -534,15 +547,18 @@ class dbMySQLConnector implements idbConnector
 					$types[ $r_table_name ] = $i->type;		
 				}	
 				
+				// Remove prefix 
+				$class_name = str_replace( self::$prefix, '', $parent);
+				
 				// Generate code for this table
 				$g->newline()
 				->comment('Relation data for table "'.$parent.'"')
-				->defarraymerge( $parent.'::$_sql_from', $sql_from )
-				->defarraymerge( $parent.'::$_sql_select', $sql_select )
-				->defarraymerge( $parent.'::$_map', $map )
-				->defvar( $parent.'::$_relation_alias', $aliases )
-				->defvar( $parent.'::$_relation_type', $types )
-				->defvar( $parent.'::$_relations', $relations );
+				->defarraymerge( $class_name.'::$_sql_from', $sql_from )
+				->defarraymerge( $class_name.'::$_sql_select', $sql_select )
+				->defarraymerge( $class_name.'::$_map', $map )
+				->defvar( $class_name.'::$_relation_alias', $aliases )
+				->defvar( $class_name.'::$_relation_type', $types )
+				->defvar( $class_name.'::$_relations', $relations );
 			}
 			
 			// Save file to wwwrot

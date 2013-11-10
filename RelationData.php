@@ -26,7 +26,7 @@ class RelationData
 	public function __construct( $base_class, $table_name, $relation_class = null )
 	{				
 		// If table name passed without namespace consider it as activerecord namespace
-		$table_name = strtolower(ns_classname( $table_name, __NAMESPACE__));		
+		$table_name = strtolower(ns_classname( $table_name, 'samson\activerecord'));		
 		
 		// If relation class not specified
 		if( !isset( $relation_class ) )

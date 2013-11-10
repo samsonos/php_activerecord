@@ -138,8 +138,11 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	public function __get_table_data( $class_name )
 	{	
+		// Remove table prefix
+		$class_name = str_replace(self::$prefix, '', $class_name);
+		
 		// Сформируем правильное имя класса
-		$class_name = ns_classname( $class_name, 'samson\activerecord');	
+		$class_name = ns_classname( $class_name, 'samson\activerecord');
 		
 		// Сформируем комманды на получение статических переменных определенного класса		
 		$_table_name 	= '$_table_name = '.$class_name.'::$_table_name;'; 
@@ -365,7 +368,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Iterate related tables
 		foreach ($query->join as $relation_data )
 		{
-			$c_table = $relation_data->table;
+			$c_table = self::$prefix.$relation_data->table;
 				
 			// Если существует требуемая связь
 			if( isset( $_sql_from[ $c_table ] ) )
@@ -676,13 +679,15 @@ class dbMySQL extends dbMySQLConnector implements idb
 				foreach ( $join as $relation_data )
 				{	
 					$join_name = $relation_data->relation;
-					$join_table = $relation_data->table;
+					
+					$join_table = self::$prefix.$relation_data->table;
 										
 					//trace('Filling related table:'.$join_name.'/'.$join_table);					
 					
 					// Get real classname of the table without alias
 					$_relation_name = $_relation_alias[ $join_table ];
-					
+					$join_class = str_replace( self::$prefix, '', $relation_data->table);
+										
 					// Получим переменные для запроса
 					$r_data = $this->__get_table_data( $_relation_name );					
 					
@@ -734,14 +739,14 @@ class dbMySQL extends dbMySQLConnector implements idb
 						{
 							$onetoone[ '_'.$join_table ] = $r_obj;
 							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы  
-							$onetoone[ '_'.$_relation_name ] = $r_obj;
+							$onetoone[ '_'.$join_class ] = $r_obj;
 						}
 						// Иначе создадим массив типа: идентификатор -> объект
 						else
 						{
 							$onetomany[ '_'.$join_table ][ $r_obj_id ] = $r_obj;
 							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы
-							$onetomany[ '_'.$_relation_name ][ $r_obj_id ] = $r_obj;
+							$onetomany[ '_'.$join_class ][ $r_obj_id ] = $r_obj;
 						}
 					}
 				}				

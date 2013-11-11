@@ -395,7 +395,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Если нужно ограничить к-во записей в выдаче по главной таблице
 		if( sizeof( $query->limit )) $sql .= "\n".' LIMIT '.$query->limit[0].(isset($query->limit[1])?','.$query->limit[1]:'');
 		
-		if( isset($GLOBALS['show_sql']) ) trace( $sql);
+		if( isset($GLOBALS['show_sql']) ) elapsed( $sql);
 		
 		return $sql;
 	}

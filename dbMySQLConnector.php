@@ -525,7 +525,7 @@ class dbMySQLConnector implements idbConnector
 						$pfield = $tableinpf !== false ? substr( $i->parent_field, $tableinpf + 1 ) : $i->parent_field;
 			
 						// Parent table field
-						$ptable = $tableinpf !== false ? substr( $i->parent_field, 0, $tableinpf ) : $i->parent;
+						$ptable = $tableinpf !== false ? dbMySQLConnector::$prefix.substr( $i->parent_field, 0, $tableinpf ) : $i->parent;					
 					}
 						
 					// If no "." symbol in parent field name append parent table name

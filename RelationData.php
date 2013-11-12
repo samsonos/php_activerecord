@@ -15,7 +15,7 @@ class RelationData
 	public $relation;
 	
 	/** Real table name name or alias table name in relation */
-	public $table;
+	public $table;	
 	
 	/**
 	 * Constructor	  
@@ -30,7 +30,7 @@ class RelationData
 		
 		// If relation class not specified
 		if( !isset( $relation_class ) )
-		{
+		{			
 			// if there is no class exists for table name specified
 			if( !class_exists($table_name) )
 			{
@@ -52,5 +52,8 @@ class RelationData
 		$this->base = $base_class;
 		$this->relation = $relation_class;
 		$this->table = classname( $table_name );
+	
+		// TODO: fix this problem
+		$this->table = str_replace('samson_activerecord_', '', $this->table);	
 	}
 }

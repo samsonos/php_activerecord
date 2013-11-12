@@ -369,7 +369,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		foreach ($query->join as $relation_data )
 		{
 			$c_table = self::$prefix.$relation_data->table;
-				
+			
 			// Если существует требуемая связь
 			if( isset( $_sql_from[ $c_table ] ) )
 			{

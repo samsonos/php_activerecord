@@ -547,7 +547,8 @@ class dbMySQL extends dbMySQLConnector implements idb
 		//if (isset($value))
 		//{
 			// Если экранирование сервер не управляет - сделаем это вручную 
-			if ( get_magic_quotes_gpc() == FALSE )  $value = mysql_escape_string( $value );
+			//if ( get_magic_quotes_gpc() == FALSE ) 
+				$value = mysql_escape_string( $value );
 			
 			// Вернем значение
 			return '"'.$value.'"';

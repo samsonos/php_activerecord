@@ -544,16 +544,14 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	private function protectQueryValue( $value )
 	{
-		//if (isset($value))
-		//{
-			// Если экранирование сервер не управляет - сделаем это вручную 
-			//if ( get_magic_quotes_gpc() == FALSE ) 
-				$value = mysql_escape_string( $value );
+		// If magic quotes are on - remove slashes
+		if( get_magic_quotes_gpc() ) $value = stripslashes( $value ); 
+				
+		// Normally escape string
+		$value = mysql_real_escape_string( $value );
 			
-			// Вернем значение
-			return '"'.$value.'"';
-		//}
-		//else return '';
+		// Return value in quotes for query
+		return '"'.$value.'"';
 	}
 	
 	/**

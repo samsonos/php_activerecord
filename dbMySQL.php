@@ -353,7 +353,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		extract($params);
 			
 		// Текст выборки полей
-		$select = $_table_name.'.*';//$_sql_select['this'];
+		$select = '`'.$_table_name.'`.*';//$_sql_select['this'];
 		
 		// If virtual fields defined
 		if( sizeof( $query->virtual_fields ) ) $select .= ', '."\n".implode("\n".', ', $query->virtual_fields);
@@ -361,7 +361,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$from = ' ( '.$this->prepareInnerSQL( $class_name, $query, $params );
 		
 		// Добавим алиас
-		$from .= ' ) as '.$_table_name;
+		$from .= ' ) as `'.$_table_name.'`';
 		
 		//trace($query->join);
 		

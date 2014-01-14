@@ -1,5 +1,6 @@
 <?php
 namespace samson\activerecord;
+use samson\core\Module;
 
 /**
  * Universal class for creating database queries 
@@ -63,7 +64,7 @@ class Query extends QueryHandler
 	{
 		// Call handlers stack
 		$this->_callHandlers();
-		
+
 		// Perform DB request
 		$result = db()->find( $this->class_name, $this );
 
@@ -82,10 +83,10 @@ class Query extends QueryHandler
 		
 		// Count records
 		$count = sizeof( $result );
-		
+
 		// Define is request was successful
 		$success = is_array( $result ) && $count;
-		
+
 		// Is amount of records is specified
 		if( isset( $limit ) )
 		{	

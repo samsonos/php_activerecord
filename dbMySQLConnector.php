@@ -715,13 +715,16 @@ class dbMySQLConnector implements idbConnector
 								'Key' 		=> 'UNI',		// Тип ключа колонки
 								'Type'		=> 'varchar(40)'// Тип значений колонки
 					);
-	
-					$table_data[] = array(
-								'Field' 	=> 'Entity',	// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'Entity',	// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> '',			// Тип ключа колонки
-								'Type'		=> 'varchar(40)'// Тип значений колонки
-					);
+
+
+
+                    $table_data[] = array(
+                                'Field' 	=> 'Entity',	// Имя колонки в структуре текущей таблицы
+                                'Column' 	=> 'Entity',	// Настоящее имя колонки текущей таблицы в общей мега таблице
+                                'Key' 		=> '',			// Тип ключа колонки
+                                'Type'		=> 'varchar(40)'// Тип значений колонки
+                    );
+
 	
 					$table_data[] = array(
 								'Field' 	=> 'Active',	// Имя колонки в структуре текущей таблицы
@@ -746,15 +749,18 @@ class dbMySQLConnector implements idbConnector
 					
 					self::$tables[ $table_id ] = $table_data;
 				}
-					
-				// Установим связь между названием колонки текущей таблицы и реальной колонкой в общей таблице
-				self::$tables[ $table_id ][] = array
-				(
-						'Field' 	=> $table_column_name,	// Имя колонки в структуре текущей таблицы
-						'Column' 	=> $row['Column2'],		// Настоящее имя колонки текущей таблицы в общей мега таблице
-						'Key' 		=> $row['Column4'],		// Тип ключа колонки
-						'Type'		=> $row['Column3']		// Тип значений колонки
-				);
+
+                // Do not add field if this is supertable(Headers)
+                if ($table_id != 'Headers') {
+                    // Установим связь между названием колонки текущей таблицы и реальной колонкой в общей таблице
+                    self::$tables[ $table_id ][] = array
+                    (
+                            'Field' 	=> $table_column_name,	// Имя колонки в структуре текущей таблицы
+                            'Column' 	=> $row['Column2'],		// Настоящее имя колонки текущей таблицы в общей мега таблице
+                            'Key' 		=> $row['Column4'],		// Тип ключа колонки
+                            'Type'		=> $row['Column3']		// Тип значений колонки
+                    );
+                }
 			}
 		}
 		return self::$tables;

@@ -28,6 +28,7 @@ class Condition
 	 * @param \samson\activerecord\Condition|\samson\activerecord\Argument|string 	$argument Entity for adding to arguments collection	 
 	 * @param string 	$value		Argument value 
 	 * @param string 	$relation	Relation between argument and value
+     * @return $this Chaining
 	 */
 	public function add( $argument, $value = '', $relation = dbRelation::EQUAL )
 	{
@@ -49,6 +50,8 @@ class Condition
 			// Add new argument to arguments collection
 			$this->arguments[] = new Argument( $argument, $value, $relation );
 		}
+
+        return $this;
 	}
 	
 	/**

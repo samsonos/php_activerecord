@@ -316,16 +316,21 @@ class dbQuery extends Query //implements idbQuery
 			$destination->arguments[] = $attribute;
 		}				
 		// If condition group is passed
-		else if( is_a( $attribute, ns_classname('dbConditionGroup')) )
+		else if( is_a( $attribute, ns_classname('Condition','samson\activerecord')) )
 		{			
 			// Iterate condition arguments
 			foreach ( $attribute->arguments as $arg ) 
-			{				
+			{
+                // Default destination condition group
+                $destination = & $this->cConditionGroup;
+
 				// TODO: add recursion as argument can be an condition group
-				// If base query table has this attribute - use base table condition collection
-				if( property_exists( $this->class_name, $arg->field )) $destination = & $this->own_condition;
-				// Else use query conditions collection			
-				else $destination = & $this->cConditionGroup;	
+                if (is_a($arg, ns_classname('Argument','samson\activerecord'))) {
+                    // If base query table has this attribute - use base table condition collection
+                    if (property_exists($this->class_name, $arg->field)) {
+                        $destination = & $this->own_condition;
+                    }
+                }
 				
 				// Add condition argument to defined destination
 				$destination->arguments[] = $attribute;

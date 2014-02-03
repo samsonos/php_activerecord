@@ -5,7 +5,7 @@ namespace samson\activerecord;
  * Аргумент условия запроса к БД
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
  * @author Nikita Kotenko <nick.w2r@gmail.com>
- *
+ * @deprecated use Argument
  */
 class dbConditionArgument extends Argument
 {	

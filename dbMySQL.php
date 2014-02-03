@@ -427,26 +427,21 @@ class dbMySQL extends dbMySQLConnector implements idb
 		return $from;		
 	}
 	
-	private function getConditions( $cond_group, $class_name )
+	private function getConditions(Condition $cond_group, $class_name )
 	{
 		// Соберем сюда все сформированные условия для удобной "упаковки" их в строку
 		$sql_condition = array();
 			
 		// Переберем все аргументы условий в условной группе условия
-		foreach ( $cond_group->arguments as $argument )
-		{
+		foreach ($cond_group->arguments as $argument){
 			// Если аргумент я вляется группой аргументов, разпарсим его дополнительно
-			if ( $argument instanceof dbConditionGroup )
-			{
-				$sql_condition[] = $this->getConditions($argument, $class_name);
-			}
-			else
-			{
+			if (is_a($argument, ns_classname('Condition','samson\activerecord'))) {
+				$sql_condition[] = $this->getConditions( $argument, $class_name);
+			} else {
 				// Если условие успешно разпознано - добавим его в коллекцию условий
 				$sql_condition[] = $this->parseCondition( $class_name, $argument );
 			}
 		}
-		
 		
 		// Соберем все условия условной группы в строку
 		if(sizeof($sql_condition)) return '('.implode( ') '.$cond_group->relation.' (', $sql_condition ).')';
@@ -461,7 +456,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 * @param dbConditionArgument 	$arg 		Аругемнт условия для преобразования
 	 * @return string Возвращает разпознанную строку с условием для MySQL
 	 */
-	private function parseCondition( $class_name, dbConditionArgument & $arg )
+	private function parseCondition( $class_name, Argument & $arg )
 	{
 		// Получим переменные для запроса
 		extract($this->__get_table_data( $class_name ));

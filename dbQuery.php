@@ -342,10 +342,10 @@ class dbQuery extends Query //implements idbQuery
 	}
 	
 	/** @see idbQuery::join() */
-	public function join( $table_name, $class_name = null )
+	public function join( $table_name, $class_name = null, $ignore = false )
 	{			
 		// Добавим имя класса в коллекцию присоединения
-		$this->join[] = new RelationData( $this->class_name, $table_name, $class_name );
+		$this->join[] = new RelationData( $this->class_name, $table_name, $class_name, $ignore );
 	
 		// Вернем себя для цепирования
 		return $this;

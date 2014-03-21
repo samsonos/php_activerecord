@@ -15,15 +15,32 @@ class RelationData
 	public $relation;
 	
 	/** Real table name name or alias table name in relation */
-	public $table;	
+	public $table;
+
+
+    /** Full table name as stored in database(with prefix) */
+    public $realTableName;
+
+    /** Short table name as stored everywhere in code (without prefix) */
+    public $virtualTableName;
+
+    /** Alias table name */
+    public $aliasTableName;
+
+    /** Class name for creating table instances */
+    public $className;
+
+    /** Flag for ignoring this class, and do not create instances of this class */
+    public $ignore = false;
 	
 	/**
 	 * Constructor	  
-	 * @param string $base_class	 Base class in relation
-	 * @param string $table_name	 Name/alias of table in relation
-	 * @param string $relation_class Classname that has to be created on joining
+	 * @param string  $base_class	    Base class in relation
+	 * @param string  $table_name	    Name/alias of table in relation
+	 * @param string  $relation_class   Classname that has to be created on joining
+     * @param boolean $ignore           Flag for not creating object instances for this class
 	 */
-	public function __construct( $base_class, $table_name_simple, $relation_class = null )
+	public function __construct( $base_class, $table_name_simple, $relation_class = null, $ignore = false )
 	{				
 		// If table name passed without namespace consider it as activerecord namespace
 		$table_name = strtolower(ns_classname( $table_name_simple, 'samson\activerecord'));
@@ -53,6 +70,7 @@ class RelationData
 		$this->base = $base_class;
 		$this->relation = $relation_class;
 		$this->table = classname( $table_name );
+        $this->ignore = $ignore;
 	
 		// TODO: fix this problem
 		$this->table = str_replace('samson_activerecord_', '', $this->table);	

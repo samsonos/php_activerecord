@@ -548,6 +548,51 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Return value in quotes for query
 		return '"'.$value.'"';
 	}
+
+    /**
+     * Create object instance by specified parameters
+     * @param string       $className   Object class name
+     * @param RelationData $metaData    Object metadata for creation and filling
+     * @param array        $dbData      Database record with object data
+     *
+     * @return idbRecord Database record object instance
+     */
+    private function & createObject($className, $identifier, array & $attributes, array & $dbData, array & $virtualFields = array())
+    {
+        // If this object instance is not cached
+        if(!isset(dbRecord::$instances[ $className ][ $identifier ])) {
+
+            // Create empry dbRecord ancestor and store it to cache
+            dbRecord::$instances[ $className ][ $identifier ] = new $className(false);
+
+            // Pointer to object
+            $object = & dbRecord::$instances[ $className ][ $identifier ];
+
+            // Set object identifier
+            $object->id = $identifier;
+
+            // Fix object connection with DB record
+            $object->attached = true;
+
+            // Fill object attributes
+            foreach ($attributes as $lc_field => $field) {
+                $object->$lc_field = $dbData[ $field ];
+            }
+
+            // Fill virtual fields
+            foreach ($virtualFields as $alias => $virtual_field) {
+                // If DB record contains virtual field data
+                if (isset($dbData[ $alias ])) {
+                    $object->$alias = $dbData[ $alias ];
+                }
+            }
+
+            return $object;
+
+        } else { // Get object instance from cache
+            return dbRecord::$instances[ $className ][ $identifier ];
+        }
+    }
 	
 	/**
 	 * Преобразовать массив записей из БД во внутреннее представление dbRecord
@@ -565,10 +610,22 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$collection = array();
 
 		// Получим переменные для запроса
-		extract( $this->__get_table_data( $class_name ) );	
-	
-		//trace( $class_name.'-'.memory_get_usage(true));
-		
+		extract($this->__get_table_data($class_name));
+
+        // Generate table metadata for joined tables
+        $joinedTableData = array();
+        foreach ($join as $relationData) {
+
+            // Generate full joined table name(including prefix)
+            $joinTable = self::$prefix.$relationData->table;
+
+            // Get real classname of the table without alias
+            $tableName = $_relation_alias[ $joinTable ];
+
+            // Get joined table class metadata
+            $joinedTableData[$tableName] = $this->__get_table_data($tableName);
+        }
+
 		// Получим имя главного
 		$main_primary = $_primary;
 
@@ -581,71 +638,22 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Указатель на текущий обрабатываемый объект
 		$main_obj = null;
 		
-		/*
-		$temp_obj_id = 0;
-		$count=0;
-		for ( $i = 0; $i < $records_count; $i++ )
-		{	
-			if($temp_obj_id!= $response[ $j ][ $main_primary ])
-			{		
-				// Получим идентфиикатор главного объекта в текущей строче БД
-				$temp_obj_id = $response[ $j ][ $main_primary ];
-				$count++;
-			}
-		}
-		*/
-		
 		// Переберем полученные записи из БД
 		for ( $i = 0; $i < $records_count; $i++ ) 
 		{
 			// Строка данных полученная из БД 
 			$db_row = & $response[ $i ];	
-			
-			//trace('Создаем новый объект на строке №'.$i.'-'.$db_row[$main_primary]);	
-			
-			// Если мы еще не создавали этот объект или если есть счетчик - КЕШ ИСПОЛЬЗОВАТЬ НЕЛЬЗЯ
-			if( ! isset( dbRecord::$instances[ $class_name ][ $main_id ] ) || isset( $db_row[ '__Count' ] ) || sizeof( $virtual_fields ) )
-			{				
-				// Создадим новый экземпляр класса сущности используя оставшиевся колонки
-				// в полученной записи из БД
-				$main_obj = new $class_name( false );
-						
-				// Установим идентификатор записи
-				$main_obj->id = $main_id;
-				
-				// Установим флаг что запись привязана к БД
-				$main_obj->attached = true;				
-					
-				// Переберем все аттрибуты главного объекта и запишем их вручную
-				foreach ( $_attributes as $lc_field => $field ) $main_obj->$field = $db_row[ $field ];
 
-				// Переберем виртуальные поля и запишем их в объект
-				foreach ( $virtual_fields as $alias => $virtual_field )
-				{					
-					if (isset($db_row[ $alias ])) $main_obj->$alias = $db_row[ $alias ];
-				}
-								
-				// Зафиксируем данный класс в локальном кеше
-				dbRecord::$instances[ $class_name ][ $main_id ] = $main_obj;
-			}
-			// Получим объект из локального кеша
-			else 
-			{
-				//elapsed('object from cache:'.$class_name.'-'.$main_id);
-				$main_obj = & dbRecord::$instances[ $class_name ][ $main_id ]; 			
-			}
-			
-			// Коллекция связанных 1-1 объектов
-			$onetoone = array();
-			
-			// Коллекция связанных 1-* объектов
-			$onetomany = array();
+            // Get object instance
+            $collection[ $main_id ] = & $this->createObject($class_name, $main_id, $_attributes, $db_row, $virtual_fields);
+
+            // Pointer to main object
+            $main_obj = & $collection[ $main_id ];
 			
 			// Выполним внутренний перебор строк из БД начиная с текущей строки
 			// Это позволит нам розабрать объекты полученные со связью один ко многим
 			// А если это связь 1-1 то цикл выполниться только один раз
-			for ($j = $i; $j < $records_count; $j++) 
-			{
+			for ($j = $i; $j < $records_count; $j++) {
 				// Строка данных полученная из БД
 				$db_inner_row = & $response[ $j ];
 				
@@ -653,8 +661,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 				$obj_id = $db_inner_row[ $main_primary ];				
 				
 				// Если в строке из БД новый идентификатор
-				if( $obj_id != $main_id )
-				{
+				if ($obj_id != $main_id) {
 					// Установим новый текущий идентификатор материала
 					$main_id = $obj_id;
 						
@@ -670,98 +677,70 @@ class dbMySQL extends dbMySQLConnector implements idb
 				//else trace(' + Заполняем данные из строки №'.$j);			
 				
 				// Переберем все присоединенные таблицы в запросе
-				foreach ( $join as $relation_data )
-				{	
-					$join_name = $relation_data->relation;
-					
-					$join_table = self::$prefix.$relation_data->table;
-										
-					//trace('Filling related table:'.$join_name.'/'.$join_table);					
-					
-					// Get real classname of the table without alias
-					$_relation_name = $_relation_alias[ $join_table ];
-					$join_class = str_replace( self::$prefix, '', $relation_data->table);
-										
-					// Получим переменные для запроса
-					$r_data = $this->__get_table_data( $_relation_name );					
-					
-					// Try to get identifier
-					if( isset($_relations[ $join_table ][ $r_data['_primary'] ]) ) $r_obj_id_field = $_relations[ $join_table ][ $r_data['_primary'] ];					
-					// Получим имя ключевого поля связанного объекта
-					else e('Cannot find related table(##) primary field(##) description', E_SAMSON_ACTIVERECORD_ERROR, array($join_table, $r_data['_primary']) );
-										
-					// Если задано имя ключевого поля связанного объекта - создадим его
-					if( isset( $db_inner_row[ $r_obj_id_field ] ))
-					{	
-						// Получим ключевое поле связанного объекта
-						$r_obj_id = $db_inner_row[ $r_obj_id_field ];
+				foreach ($join as $relation_data) {
+                    /**@var \samson\activerecord\RelationData $relation_data*/
 
-						//trace('Primary column:'.$r_obj_id_field.'('.$r_obj_id.')');
-						//trace($db_inner_row);
-						
-						// Если мы еще не создавали этот объект
-						if( ! isset( dbRecord::$instances[ $join_name ][ $r_obj_id ] ) )
-						{
-							// Создадим пустой связанный объект
-							$r_obj = new $join_name( false );
-							
-							// Установим ключевое поле связанного объекта
-							$r_obj->id = $r_obj_id;
-							
-							// Установим флаг что запись привязана к БД
-							$r_obj->attached = true;						
-	
-							// Переберем все аттрибуты присодененной таблицы и запишем значение поля связанного класса
-							foreach ( $_relations[ $join_table ] as $field => $lc_field  ) 
-							{
-								//trace('  '.$field.'('.$lc_field.')->'.$db_inner_row[ $lc_field ]);
-								
-								$r_obj->$field = $db_inner_row[ $lc_field ];				
-							}					
-							
-							// Зафиксируем данный класс в локальном кеше
-							dbRecord::$instances[ $join_name ][ $r_obj_id ] = $r_obj;
-						}
-						// Получим объект из локального кеша
-						else $r_obj = dbRecord::$instances[ $join_name ][ $r_obj_id ];
+                    // If this table is not ignored
+                    if (!$relation_data->ignore) {
 
-						// Call handler for object filling
-						$r_obj->filled();
-						
-						// Если связанный объект привязан как один-к-одному - просто довами ссылку на него
-						if( $_relation_type[ $join_table ] == 0 ) 
-						{
-							$onetoone[ '_'.$join_table ] = $r_obj;
-							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы  
-							$onetoone[ '_'.$join_class ] = $r_obj;
-						}
-						// Иначе создадим массив типа: идентификатор -> объект
-						else
-						{
-							$onetomany[ '_'.$join_table ][ $r_obj_id ] = $r_obj;
-							// TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы
-							$onetomany[ '_'.$join_class ][ $r_obj_id ] = $r_obj;
-						}
-					}
+                        // TODO: Prepare all data in RelationObject to speed up this method
+
+                        $join_name = $relation_data->relation;
+
+                        $join_table = self::$prefix.$relation_data->table;
+
+                        //trace('Filling related table:'.$join_name.'/'.$join_table);
+
+                        // Get real classname of the table without alias
+                        $_relation_name = $_relation_alias[ $join_table ];
+                        $join_class = str_replace( self::$prefix, '', $relation_data->table);
+
+                        // Get joined table metadata from previously prepared object
+                        $r_data = $joinedTableData[ $_relation_name ];
+
+                        // Try to get identifier
+                        if( isset($_relations[ $join_table ][ $r_data['_primary'] ]) ) $r_obj_id_field = $_relations[ $join_table ][ $r_data['_primary'] ];
+                        // Получим имя ключевого поля связанного объекта
+                        else e('Cannot find related table(##) primary field(##) description', E_SAMSON_ACTIVERECORD_ERROR, array($join_table, $r_data['_primary']) );
+
+                        // Если задано имя ключевого поля связанного объекта - создадим его
+                        if( isset( $db_inner_row[ $r_obj_id_field ] ))
+                        {
+                            // Получим ключевое поле связанного объекта
+                            $r_obj_id = $db_inner_row[ $r_obj_id_field ];
+
+                            // Get joined object instance
+                            $r_obj = & $this->createObject($join_name, $r_obj_id, $_relations[ $join_table ], $db_inner_row);
+
+                            // Call handler for object filling
+                            $r_obj->filled();
+
+                            // TODO: Это старый подход - сохранять не зависимо от алиаса под реальным именем таблицы
+
+                            // Если связанный объект привязан как один-к-одному - просто довами ссылку на него
+                            if( $_relation_type[ $join_table ] == 0 )
+                            {
+                                $main_obj->onetoone[ '_'.$join_table ] = $r_obj;
+                                $main_obj->onetoone[ '_'.$join_class ] = $r_obj;
+                            }
+                            // Иначе создадим массив типа: идентификатор -> объект
+                            else
+                            {
+                                $main_obj->onetomany[ '_'.$join_table ][ $r_obj_id ] = $r_obj;
+                                $main_obj->onetomany[ '_'.$join_class ][ $r_obj_id ] = $r_obj;
+                            }
+                        }
+                    }
 				}				
-			}		
-			
-			// Присоединим связанные объекты в данные главного объекта
-			$main_obj->onetoone = $onetoone;			
-			$main_obj->onetomany = $onetomany;
+			}
 			
 			// Call handler for object filling
 			$main_obj->filled();
-				
-			// Добавим созданный объект в результат
-			$collection[ $main_obj->id ] = $main_obj;
-			
+
 			// Если внутренний цикл дошел до конца остановим главный цикл
 			if( $j == $records_count ) break;
-		}	
-			
-		//trace( $class_name.'-'.memory_get_usage(true));
-		
+		}
+
 		// Вернем то что у нас вышло
 		return $collection;
 	}

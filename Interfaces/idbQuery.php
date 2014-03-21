@@ -33,14 +33,16 @@ interface idbQuery
 	 * @return idbQuery Указатель на самого себя для цепирования	 
 	 */
 	public function cond( $attribute, $value = '', $relation = dbRelation::EQUAL );
-	
-	/**
-	 * Присоединить подчиненную таблицу к выборке запроса
-	 * 
-	 * @param string $table_name Имя таблицы для присоединения
-	 * @return idbQuery Указатель на самого себя для цепирования
-	 */
-	public function join( $table_name );
+
+    /**
+     * Join table to query
+     * @param string $table_name    Real table name from DB without prefix
+     * @param string $class_name    Class name for creating instances
+     * @param bool  $ignore         Flag for NOT creating instances of joining class
+     *
+     * @return dbQuery Chaining
+     */
+    public function join( $table_name, $class_name = null, $ignore = false );
 	
 	/**
 	 * Добавить новое виртуальное поле в запрос

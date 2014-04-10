@@ -129,6 +129,41 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Выполним прямой запрос на удаление записи
 		return $this->query( 'DELETE FROM `'.$_table_name.'` WHERE '.$_primary.' = "' . $object->id . '"', FALSE );
 	}
+
+    /**
+     * Check object $field field value as $table column
+     * and if database table does not have it - create.
+     * $field is not set in object - error returns
+     *
+     * @param object $object Pointer to object to get field names data
+     * @param        $table  Database table name
+     * @param        $field  Object field name
+     * @param string $type   Database column name
+     *
+     * @return bool True if database table has field or field has been created
+     */
+    public function createField($object, $table, $field, $type = 'INT')
+    {
+        // Check if db identifier field is configured
+        if(strlen($object->$field)) {
+
+            // Variable to get all social table attributes
+            $attributes = array();
+            // Get table attributes - PHP 5.2 compatible
+            eval('$attributes = '.$object->dbTable.'::$_attributes;');
+
+            // If table does not have defined identifier field
+            if (!isset($attributes[$object->$field])) {
+                // Add identifier field to social users table
+                $this->simple_query('ALTER TABLE  `'.classname($table).'` ADD  `'.$object->$field.'` '.$type.' ');
+            }
+
+            return true;
+
+        } else { // Signal error
+            return e('Cannot load "'.$class.'" module - no $'.$field.' is configured');
+        }
+    }
 	
 	// TODO: Очень узкое место для совместимости с 5.2 !!!
 	/**
@@ -235,6 +270,33 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Вернем коллекцию полученных объектов
 		return $result;
 	}
+
+    public function & findFields($class_name, dbQuery $query, $field)
+    {
+        // Get SQL
+        $sql = $this->prepareSQL($class_name, $query);
+        // Выполним запрос к БД
+        $sql_result = mysql_query( $sql, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );
+        $result = array();
+
+        // Если нам вернулся ресурс
+        if( !is_bool($sql_result) )
+        {
+            // Заполним все результаты
+            while( $row = mysql_fetch_array( $sql_result, MYSQL_ASSOC ) ) {
+                if (isset($row[$field])) {
+                    $result[$row[$field]] = $row[$field];
+                }
+            }
+
+            // Очистим память
+            mysql_free_result( $sql_result );
+        }
+
+        $result = array_values ($result);
+        // Вернем коллекцию полученных объектов
+        return $result;
+    }
 	
 	/**	 
 	 * @see idb::find_by_id()
@@ -560,7 +622,7 @@ class dbMySQL extends dbMySQLConnector implements idb
     private function & createObject($className, $identifier, array & $attributes, array & $dbData, array & $virtualFields = array())
     {
         // If this object instance is not cached
-        if(!isset(dbRecord::$instances[ $className ][ $identifier ])) {
+        if(!isset(dbRecord::$instances[ $className ][ $identifier ]) || isset($dbData['__Count']) || sizeof($virtualFields)) {
 
             // Create empry dbRecord ancestor and store it to cache
             dbRecord::$instances[ $className ][ $identifier ] = new $className(false);
@@ -603,6 +665,10 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	private function & toRecords( $class_name, array & $response, array $join = array(), array $virtual_fields = array() )
 	{
+        //[PHPCOMPRESSOR(remove,start)]
+        s()->benchmark( __FUNCTION__, func_get_args(), __CLASS__ );
+        //[PHPCOMPRESSOR(remove,end)]
+
 		// Сформируем правильное имя класса		
 		$class_name = ns_classname( $class_name, 'samson\activerecord');
 		

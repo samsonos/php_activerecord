@@ -48,9 +48,22 @@ class Query extends QueryHandler
 	 * @param string $return		External variable to store query results	
 	 * @return Ambigous <boolean, NULL, mixed>
 	 */
-	public function fields( $field_name, & $return = null ){ $args = func_num_args() - 1; return $this->execute( $return, $args, null, array( $this, '_toFieldArray'), array($field_name) );  }	
-	
-	/**
+	public function fields( $field_name, & $return = null ){ $args = func_num_args() - 1; return $this->execute( $return, $args, null, array( $this, '_toFieldArray'), array($field_name) );  }
+
+    public function fieldsNew( $field_name, & $return = null ){
+        $args = func_num_args() - 1;
+        // Perform DB request
+        $return = db()->findFields( $this->class_name, $this,  $field_name);
+
+        $success = is_array( $return ) && sizeof($return);
+
+        // If parent function has arguments - consider them as return value and return request status
+        if( $args > 0 ) return $success;
+        // Parent function has no arguments, return request result
+        else return $return;
+    }
+
+    /**
 	 * Perform database request and return different results depending on function arguments.	 
 	 * @see \samson\activerecord\Record
 	 * @param array 	$result 		External variable to store dabatase request results collection

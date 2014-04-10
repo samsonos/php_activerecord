@@ -358,7 +358,7 @@ class dbQuery extends Query //implements idbQuery
 		$destination = & $this->group;
 		
 		// If this field belongs to query main class
-		if (property_exists( $this->class_name, $field )) $destination = & $this->own_group;
+		//if (property_exists( $this->class_name, $field )) $destination = & $this->own_group;
 		
 		$destination[] = $field;
 	

@@ -150,18 +150,21 @@ class dbMySQL extends dbMySQLConnector implements idb
             // Variable to get all social table attributes
             $attributes = array();
             // Get table attributes - PHP 5.2 compatible
-            eval('$attributes = '.$object->dbTable.'::$_attributes;');
+            eval('$attributes = '.$table.'::$_attributes;');
+
+            // Remove namespaces
+            $table = classname($table);
 
             // If table does not have defined identifier field
             if (!isset($attributes[$object->$field])) {
                 // Add identifier field to social users table
-                $this->simple_query('ALTER TABLE  `'.classname($table).'` ADD  `'.$object->$field.'` '.$type.' ');
+                $this->simple_query('ALTER TABLE  `'.$table.'` ADD  `'.$object->$field.'` '.$type.' ');
             }
 
             return true;
 
         } else { // Signal error
-            return e('Cannot load "'.$class.'" module - no $'.$field.' is configured');
+            return e('Cannot load "'.get_class($object).'" module - no $'.$field.' is configured');
         }
     }
 	

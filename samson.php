@@ -14,7 +14,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 	 * Коллекция связей модуля	 
 	 * @var array
 	 */
-	protected $requirements = array(); 
+	protected $requirements = array('core'); 
 	
 	/***/
 	public $prefix;

@@ -136,8 +136,8 @@ class dbMySQL extends dbMySQLConnector implements idb
      * $field is not set in object - error returns
      *
      * @param object $object Pointer to object to get field names data
-     * @param        $table  Database table name
-     * @param        $field  Object field name
+     * @param string $table  Database table name
+     * @param string $field  Object field name
      * @param string $type   Database column name
      *
      * @return bool True if database table has field or field has been created
@@ -155,8 +155,11 @@ class dbMySQL extends dbMySQLConnector implements idb
             // Remove namespaces
             $table = classname($table);
 
+            // Make keys lowercase
+            $attributes = array_change_key_case_unicode($attributes);
+
             // If table does not have defined identifier field
-            if (!isset($attributes[$object->$field])) {
+            if (!isset($attributes[strtolower($object->$field)])) {
                 // Add identifier field to social users table
                 $this->simple_query('ALTER TABLE  `'.$table.'` ADD  `'.$object->$field.'` '.$type.' ');
             }

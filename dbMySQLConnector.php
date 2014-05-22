@@ -779,6 +779,7 @@ class dbMySQLConnector implements idbConnector
 		$host 	= (!isset($params['host'])) ? 'localhost' : $params['host'];
 		$login 	= (!isset($params['login'])) ? 'root' : $params['login'];
 		$pwd 	= (!isset($params['pwd'])) ? '' : $params['pwd'];
+        $port 	= (!isset($params['port'])) ? '' : ':'.$params['port'];
 		
 		$this->base_name =(!isset($params['pwd'])) ? '' : $params['pwd'];
 		
@@ -793,7 +794,7 @@ class dbMySQLConnector implements idbConnector
 			$this->connected = true;
 			
 			// Выполнить открытие подключения к БД
-			$this->link = mysql_connect( $host, $login, $pwd ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );
+			$this->link = mysql_connect( $host.$port, $login, $pwd ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );
 			
 			// Выполнить открытие необходимой БД
 			mysql_select_db( $this->base_name, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );		

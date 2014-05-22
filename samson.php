@@ -9,23 +9,24 @@ class ActiveRecordConnector extends CompressableExternalModule
 	 * @var string
 	 */
 	protected $id = 'activerecord';
-
-	/**
-	 * Коллекция связей модуля	 
-	 * @var array
-	 */
-	protected $requirements = array('core'); 
 	
-	/***/
+	/** Database table prefix */
 	public $prefix;
-	/***/
+
+	/** Database name */
 	public $name;
-	/***/
+
+	/** Login */
 	public $login = 'root';
-	/***/
+
+	/** Password */
 	public $pwd;
-	/***/
+
+	/** Host */
 	public $host = '127.0.0.1';
+
+    /** @var string Port number */
+    public $port = '';
 	
 	/* Array of additional relations to set */
 	public $relations  = array();
@@ -71,10 +72,11 @@ class ActiveRecordConnector extends CompressableExternalModule
 		
 		// Connect to database
 		db()->connect(array(
-			'name' => $this->name,
-			'login'=> $this->login,
-			'pwd' =>  $this->pwd,
-			'host' =>  $this->host
+			'name'  => $this->name,
+			'login' => $this->login,
+			'pwd'   => $this->pwd,
+			'host'  => $this->host,
+            'port'  => $this->port
 		));		
 		
 		// Create specific relations

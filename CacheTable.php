@@ -14,7 +14,7 @@ class CacheTable implements iCache
 		// Если мы успешно выполнили запрос к БД
 		if( ! is_bool( $sql_result ) )
 		{			
-			$row = mysql_fetch_row( $sql_result );
+			$row = mysqli_fetch_row( $sql_result );
 			
 			// If we recieved data from db
 			if( is_array($row) ) $ret_val = unserialize(base64_decode($row[ 0 ]));	
@@ -42,7 +42,7 @@ class CacheTable implements iCache
 		//trace(strlen($value));
 		
 		// Perform request to db
-		if( strlen($value) < 65400 ) mysql_query( 'INSERT INTO `'.self::TABLE_NAME.'` ( `key`, `value` ) VALUES '.	
+		if( strlen($value) < 65400 ) mysqli_query( 'INSERT INTO `'.self::TABLE_NAME.'` ( `key`, `value` ) VALUES '.
 		'("'.md5($key).'","'.$value.'") ON DUPLICATE KEY UPDATE `value`="'.$value.'"');
 		else e('Cannot cache(##) string too long()', E_SAMSON_ACTIVERECORD_ERROR, array( $key, strlen($value) ));
 	}

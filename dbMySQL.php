@@ -37,7 +37,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		if( ! $this->connected ) return e('Подключение к БД не было выполнено', E_SAMSON_FATAL_ERROR );
 					
 		// Выполним запрос к БД
-		$resource = mysql_query( $sql, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );	
+		$resource = mysqli_query(  $this->link, $sql ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
 
 		// Если нужно то выведем запрос
 		if( isset($_SESSION['__AR_SHOW_QUERY__']) ) elapsed($sql);
@@ -63,7 +63,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		//echo($sql."\n");
 			
 		// Выполним запрос к БД
-		$sql_result = mysql_query( $sql, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );		
+		$sql_result = mysqli_query(  $this->link, $sql ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
 			
 		// Если нужно то выведем запрос
 		if( isset($_SESSION['__AR_SHOW_QUERY__']) )elapsed($sql);
@@ -72,10 +72,10 @@ class dbMySQL extends dbMySQLConnector implements idb
 		if( !is_bool($sql_result) )
 		{
 			// Заполним все результаты
-			while( $row = mysql_fetch_array( $sql_result, MYSQL_ASSOC ) ) $rows[] = $row;				
+			while( $row = mysqli_fetch_array( $sql_result, MYSQL_ASSOC ) ) $rows[] = $row;
 
 			// Очистим память
-			mysql_free_result( $sql_result );			
+			mysqli_free_result( $sql_result );
 		}
 			
 		// Увеличим счетких запросов для статистики
@@ -101,7 +101,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		$this->query( 'INSERT INTO `'.$_table_name.'` (`'.implode( '`,`', array_keys( $fields ) ).'`) VALUES ('.implode( ',', $fields ).')' ); 
 		
 		// Вернем идентификатор новосозданной записи в БД
-		return mysql_insert_id( $this->link );		
+		return mysqli_insert_id( $this->link );
 	}
 	
 	/** @see idb::update() */
@@ -282,21 +282,21 @@ class dbMySQL extends dbMySQLConnector implements idb
         // Get SQL
         $sql = $this->prepareSQL($class_name, $query);
         // Выполним запрос к БД
-        $sql_result = mysql_query( $sql, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );
+        $sql_result = mysqli_query($this->link, $sql ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
         $result = array();
 
         // Если нам вернулся ресурс
         if( !is_bool($sql_result) )
         {
             // Заполним все результаты
-            while( $row = mysql_fetch_array( $sql_result, MYSQL_ASSOC ) ) {
+            while( $row = mysqli_fetch_array( $sql_result, MYSQL_ASSOC ) ) {
                 if (isset($row[$field])) {
                     $result[$row[$field]] = $row[$field];
                 }
             }
 
             // Очистим память
-            mysql_free_result( $sql_result );
+            mysqli_free_result( $sql_result );
         }
 
         $result = array_values ($result);
@@ -611,7 +611,7 @@ class dbMySQL extends dbMySQLConnector implements idb
 		if( get_magic_quotes_gpc() ) $value = stripslashes( $value ); 
 				
 		// Normally escape string
-		$value = mysql_real_escape_string( $value );
+		$value = mysqli_real_escape_string($this->link, $value );
 			
 		// Return value in quotes for query
 		return '"'.$value.'"';

@@ -584,10 +584,11 @@ class dbMySQLConnector implements idbConnector
 		$db_mapper = $this->mapper();	
 		
 		// Получим информацию о всех таблицах из БД
-		$show_query = mysql_query('SELECT `TABLES`.`TABLE_NAME` as `TABLE_NAME`, `COLUMNS`.`COLUMN_NAME` as `Field`,`COLUMNS`.`DATA_TYPE` as `Type`,`COLUMNS`.`IS_NULLABLE` as `Null`,`COLUMNS`.`COLUMN_KEY` as `Key`,`COLUMNS`.`COLUMN_DEFAULT` as `Default`,`COLUMNS`.`EXTRA` as `Extra` FROM `information_schema`.`TABLES` as `TABLES` LEFT JOIN `information_schema`.`COLUMNS` as `COLUMNS` ON `TABLES`.`TABLE_NAME`=`COLUMNS`.`TABLE_NAME` WHERE `TABLES`.`TABLE_SCHEMA`="'.$this->base_name.'" AND `COLUMNS`.`TABLE_SCHEMA`="'.$this->base_name.'"',
-		$this->link );
+		$show_query = mysqli_query($this->link,
+         'SELECT `TABLES`.`TABLE_NAME` as `TABLE_NAME`, `COLUMNS`.`COLUMN_NAME` as `Field`,`COLUMNS`.`DATA_TYPE` as `Type`,`COLUMNS`.`IS_NULLABLE` as `Null`,`COLUMNS`.`COLUMN_KEY` as `Key`,`COLUMNS`.`COLUMN_DEFAULT` as `Default`,`COLUMNS`.`EXTRA` as `Extra` FROM `information_schema`.`TABLES` as `TABLES` LEFT JOIN `information_schema`.`COLUMNS` as `COLUMNS` ON `TABLES`.`TABLE_NAME`=`COLUMNS`.`TABLE_NAME` WHERE `TABLES`.`TABLE_SCHEMA`="'.$this->base_name.'" AND `COLUMNS`.`TABLE_SCHEMA`="'.$this->base_name.'"'
+		 );
 		
-		while( $row = mysql_fetch_array( $show_query, MYSQL_ASSOC ) )
+		while( $row = mysqli_fetch_array( $show_query, MYSQL_ASSOC ) )
 		{ 
 			// Получим имя таблицы
 			$table_name = $row['TABLE_NAME'];
@@ -679,7 +680,7 @@ class dbMySQLConnector implements idbConnector
 	public function mapper( $mapper_table = 'scmstable', $mapper_id='Headers' )
 	{
 		// Сформируем запрос на получение таблицы которая описывает структуру других таблиц
-		$sql_result = mysql_query( 'SELECT * FROM `'.$mapper_table.'` WHERE Entity = "'.$mapper_id.'" AND Active = "1" ORDER BY RowID ASC',$this->link );
+		$sql_result = mysqli_query( $this->link, 'SELECT * FROM `'.$mapper_table.'` WHERE Entity = "'.$mapper_id.'" AND Active = "1" ORDER BY RowID ASC' );
 	
 		// Если получен результат
 		if( ! is_bool($sql_result) )
@@ -687,7 +688,7 @@ class dbMySQLConnector implements idbConnector
 
 			// Переберем полученные строки описывающие структуру других таблиц
 			// Заполним все результаты
-			while( $row = mysql_fetch_array( $sql_result, MYSQL_ASSOC ) )
+			while( $row = mysqli_fetch_array( $sql_result, MYSQL_ASSOC ) )
 			{
 				// Идентификатор текущей таблицы
 				$table_id = $row['Column0'];
@@ -794,15 +795,12 @@ class dbMySQLConnector implements idbConnector
 			$this->connected = true;
 			
 			// Выполнить открытие подключения к БД
-			$this->link = mysql_connect( $host.$port, $login, $pwd ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );
-			
-			// Выполнить открытие необходимой БД
-			mysql_select_db( $this->base_name, $this->link ) or e( mysql_error( $this->link ), E_SAMSON_SQL_ERROR );		
-			
+			$this->link = mysqli_connect( $host, $login, $pwd, $this->base_name ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
+
 			// Выполнить установку языковых параметров работы с БД
-			mysql_query ("set character_set_client='utf8'", $this->link );
-			mysql_query ("set character_set_results='utf8'", $this->link );
-			mysql_query ("set collation_connection='utf8_general_ci'", $this->link );			
+			mysqli_query ($this->link, "set character_set_client='utf8'" );
+			mysqli_query ($this->link, "set character_set_results='utf8'" );
+			mysqli_query ($this->link, "set collation_connection='utf8_general_ci'");
 		}
 	}
 	
@@ -813,7 +811,7 @@ class dbMySQLConnector implements idbConnector
 	public function disconnect( array $params = NULL )
 	{
 		// Выполним отключение от БД
-		mysql_close( $this->link );
+		mysqli_close( $this->link );
 	}
 	
 	/**	 

@@ -49,7 +49,7 @@ class RelationData
 		if( !isset( $relation_class ) )
 		{			
 			// if there is no class exists for table name specified
-			if( !class_exists($table_name) )
+			if( !class_exists($table_name, false) )
 			{
 				// PHP < 5.3 get relation aliases
 				eval('$_relation_alias = '.$base_class.'::$_relation_alias;');

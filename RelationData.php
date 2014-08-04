@@ -57,6 +57,9 @@ class RelationData
 				// Try to find classname in relation aliases
                 if( isset($_relation_alias[ $table_name_simple ])) $relation_class = ns_classname( $_relation_alias[ $table_name_simple ], __NAMESPACE__);
                 else if( isset($_relation_alias[ $table_name ])) $relation_class = ns_classname( $_relation_alias[ $table_name ], __NAMESPACE__);
+				else { // use thi table name as class
+                    $relation_class = $table_name;
+                }
 			}
 			// Relation class name equals to table name
 			else $relation_class = $table_name;

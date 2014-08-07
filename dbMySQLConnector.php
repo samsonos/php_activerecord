@@ -532,7 +532,7 @@ class dbMySQLConnector implements idbConnector
 					$pf = '`'.$ptable.'`.`'.$pfield.'`';
 			
 					// If child field not specified
-					if( !isset($i->child_field{0})) $cf  =  '`'.$i->child.'`.`'.$pfield.'`';
+                    if( !isset($i->child_field{0})) $cf  =  '`'.(isset($i->alias{0})?$i->alias:$i->child).'`.`'.$pfield.'`';
 					// If no "." symbol in child field name append child table name
 					else $cf = strpos( $i->child_field, '.') === false ? '`'.(isset($i->alias{0})?$i->alias:$i->child).'`.'.$i->child_field : $i->child_field;
 			

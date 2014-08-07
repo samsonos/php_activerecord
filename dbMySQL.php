@@ -64,9 +64,9 @@ class dbMySQL extends dbMySQLConnector implements idb
 			
 		// Выполним запрос к БД
 		$sql_result = mysqli_query(  $this->link, $sql ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
-			
-		// Если нужно то выведем запрос
-		if( isset($_SESSION['__AR_SHOW_QUERY__']) ) {
+
+        // Если нужно то выведем запрос
+        if( isset($_SESSION['__AR_SHOW_QUERY__']) ) {
             elapsed($sql);
             trace($sql, true);
         }

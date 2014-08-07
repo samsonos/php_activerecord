@@ -48,6 +48,9 @@ class dbQuery extends Query //implements idbQuery
 	
 	/** Virtual fields */
 	public $virtual_fields = array();
+
+    /** @var bool True to show requests */
+    protected $debug = false;
 	
 	/**
 	 * Коллекция условных групп для запроса 
@@ -269,7 +272,20 @@ class dbQuery extends Query //implements idbQuery
 		
 		// Вернем себя для цепирования
 		return $this;	
-	}	
+	}
+
+    /**
+     * Set debug query mode
+     * @param bool $value Debug status, true - active
+     *
+     * @return $this Chaining
+     */
+    public function debug($value = true)
+    {
+        db()->debug($this->debug = $value);
+
+        return $this;
+    }
 	
 	public function isnull( $attribute ){ return $this->cond($attribute,'',dbRelation::ISNULL); }
 	public function notnull( $attribute ){ return $this->cond($attribute,'',dbRelation::NOTNULL); }

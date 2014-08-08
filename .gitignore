@@ -1,9 +1,11 @@
-.idea*
-vendor/*
-upload/*
+.buildpath
+.project
+.settings*
+.idea
+.idea/*
 cache/*
+vendor/*
 cms/*
-cms/cache/*
-cms/upload/* 
+out/*
 composer.lock
-composer.phar
+

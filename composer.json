@@ -9,7 +9,8 @@
     "homepage":"http://samsonos.com/",
     "autoload": {
         "psr-0": {
-            "\samson\activerecord\\": "src/"
+            "samsonos\activerecord\\": "src/",
+            "files": ["src/global.php"]
         }
     }
 }

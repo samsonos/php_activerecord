@@ -10,7 +10,7 @@
     "autoload": {
         "classmap": ["src/"],
         "psr-0": {
-            "samsonos\activerecord\\": "src/"
+            "samsonos\\activerecord\\": "src/"
         },
         "files": ["src/global.php"]
     }

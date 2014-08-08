@@ -8,9 +8,10 @@
     "license":"Open Software License (OSL) v 3.0",
     "homepage":"http://samsonos.com/",
     "autoload": {
+        "classmap": ["src/"],
         "psr-0": {
-            "samsonos\activerecord\\": "src/",
-            "files": ["src/global.php"]
-        }
+            "samsonos\activerecord\\": "src/"
+        },
+        "files": ["src/global.php"]
     }
 }

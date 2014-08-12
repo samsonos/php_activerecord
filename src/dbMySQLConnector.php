@@ -420,7 +420,7 @@ class dbMySQLConnector implements idbConnector
 				// Создадим специальную функцию для динамических запросов к АктивРекорду		
 				//$class_eval .= "\n".'namespace {';
 				$func_eval .= "\n".'/** '."\n".' * @return dbQuery '."\n".' */';
-				$func_eval .= "\n".'function ' . $func_name . '(){ return new \Samson\ActiveRecord\dbQuery("'.$class_name.'"); }'."\n"."\n";
+				$func_eval .= "\n".'function ' . $func_name . '(){ return new \samson\activerecord\dbQuery("'.$class_name.'"); }'."\n"."\n";
 				//$class_eval .= "\n}";				
 			}
 		}			

@@ -280,8 +280,22 @@ class dbMySQL extends dbMySQLConnector implements idb
 		return $result;
 	}
 
+    /**
+     * Special accelerated function to retrieve db record fields instead of objects
+     *
+     * @param string    $class_name
+     * @param dbQuery   $query
+     * @param string    $field
+     *
+     * @return array
+     */
     public function & findFields($class_name, dbQuery $query, $field)
     {
+        // If field is not an array
+        if (!is_array($field)) {
+            $fields = array();
+        }
+
         // Get SQL
         $sql = $this->prepareSQL($class_name, $query);
         // Выполним запрос к БД
@@ -289,8 +303,7 @@ class dbMySQL extends dbMySQLConnector implements idb
         $result = array();
 
         // Если нам вернулся ресурс
-        if( !is_bool($sql_result) )
-        {
+        if( !is_bool($sql_result)) {
             // Заполним все результаты
             while( $row = mysqli_fetch_array( $sql_result, MYSQL_ASSOC ) ) {
                 if (isset($row[$field])) {

@@ -1,7 +1,9 @@
 <?php 
 namespace samson\activerecord;
 
+//[PHPCOMPRESSOR(remove,start)]
 use samson\core\Generator;
+//[PHPCOMPRESSOR(remove,end)]
 use samson\core\File;
 
 /**

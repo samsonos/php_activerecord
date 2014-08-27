@@ -43,7 +43,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 		// Build activerecord cache path
 		$cache_path = __SAMSON_CWD__.__SAMSON_CACHE_PATH.dbMySQLConnector::CACHE_PATH;
 				
-		// Iterate throug generated php code
+		// Iterate through generated php code
 		foreach (\samson\core\File::dir( $cache_path.'metadata', 'php', '', $r, 1 ) as $file)
 		{	
 			// No namespace for global function file
@@ -101,8 +101,6 @@ class ActiveRecordConnector extends CompressableExternalModule
 	{	
 		parent::init( $params );
 
-		//trace('AR:init');
-			
 		// Set table prefix
 		dbMySQLConnector::$prefix = $this->prefix;
 		
@@ -114,7 +112,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 			'host' =>  $this->host
 		));	
 
-		//[PHPCOMPRESSOR(remove,start)]		
+		//[PHPCOMPRESSOR(remove,start)]
 		// Generate table relations
 		db()->relations();
 		//[PHPCOMPRESSOR(remove,end)]

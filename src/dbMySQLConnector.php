@@ -580,11 +580,17 @@ class dbMySQLConnector implements idbConnector
 	public function generate( $force = false )
 	{		
 		// Processed permanent table relations
-		$db_relations = array();			
-	
-		// Получим описание относительных таблиц
-		$db_mapper = $this->mapper();	
-		
+		$db_relations = array();
+
+        // Create virtual entities
+        $virtualTable = new \samson\activerecord\VirtualTable(db()->link, dbMySQLConnector::$prefix.'unitable');
+
+        // Create real db table if not exists
+        $virtualTable->create();
+
+        // Получим описание относительных таблиц
+        $virtualTable->getStructure($db_mapper);
+
 		// Получим информацию о всех таблицах из БД
 		$show_query = mysqli_query($this->link,
          'SELECT `TABLES`.`TABLE_NAME` as `TABLE_NAME`, `COLUMNS`.`COLUMN_NAME` as `Field`,`COLUMNS`.`DATA_TYPE` as `Type`,`COLUMNS`.`IS_NULLABLE` as `Null`,`COLUMNS`.`COLUMN_KEY` as `Key`,`COLUMNS`.`COLUMN_DEFAULT` as `Default`,`COLUMNS`.`EXTRA` as `Extra` FROM `information_schema`.`TABLES` as `TABLES` LEFT JOIN `information_schema`.`COLUMNS` as `COLUMNS` ON `TABLES`.`TABLE_NAME`=`COLUMNS`.`TABLE_NAME` WHERE `TABLES`.`TABLE_SCHEMA`="'.$this->base_name.'" AND `COLUMNS`.`TABLE_SCHEMA`="'.$this->base_name.'"'
@@ -666,108 +672,7 @@ class dbMySQLConnector implements idbConnector
 		//elapsed('end');
 	}
 	
-	/**
-	 * Установить специальный режим работы - "Маппинг"
-	 * При таком режиме работы БД вся информация о таблицах и все
-	 * данные этих таблиц физически размещаются в одной таблице БД,
-	 * но для разработчика этот факт остается прозрачным а все подмены
-	 * выполняются на уровне ActiveRecord.
-	 * Такой подход дает универсальность в обработке данных таких таблиц
-	 * и экономит огрмное количество кода и веремени при создании/управлении
-	 * различными сущностями.
-	 *
-	 * @param string $mapper_table Имя таблицы в БД, которая хранит все данные
-	 * @param string $mapper_id Идентификатор сущности описывающий структуры таблиц
-	 */
-	public function mapper( $mapper_table = 'scmstable', $mapper_id='Headers' )
-	{
-		// Сформируем запрос на получение таблицы которая описывает структуру других таблиц
-		$sql_result = mysqli_query( $this->link, 'SELECT * FROM `'.$mapper_table.'` WHERE Entity = "'.$mapper_id.'" AND Active = "1" ORDER BY RowID ASC' );
-	
-		// Если получен результат
-		if( ! is_bool($sql_result) )
-		{
 
-			// Переберем полученные строки описывающие структуру других таблиц
-			// Заполним все результаты
-			while( $row = mysqli_fetch_array( $sql_result, MYSQL_ASSOC ) )
-			{
-				// Идентификатор текущей таблицы
-				$table_id = $row['Column0'];
-	
-				// Имя колонки в структуре текущей таблицы
-				$table_column_name = $row['Column1'];
-	
-				// Проверим существует ли группа описаний для структуры текущей таблицы
-				if( ! isset( self::$tables[ $table_id ] ))
-				{					
-					// Создадим коллекцию описывающую структуру таблицы
-					$table_data = array();
-	
-					// Добавим общие колонки таблицы "Маппинга" принадлежащие каждой сущности
-					$table_data[] = array(
-								'Field' 	=> 'RowID',		// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'RowID',		// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> 'PRI',		// Тип ключа колонки
-								'Type'		=> 'int(255)'	// Тип значений колонки
-					);
-	
-					$table_data[] = array(
-								'Field' 	=> 'EntityID',	// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'EntityID',	// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> 'UNI',		// Тип ключа колонки
-								'Type'		=> 'varchar(40)'// Тип значений колонки
-					);
-
-
-
-                    $table_data[] = array(
-                                'Field' 	=> 'Entity',	// Имя колонки в структуре текущей таблицы
-                                'Column' 	=> 'Entity',	// Настоящее имя колонки текущей таблицы в общей мега таблице
-                                'Key' 		=> '',			// Тип ключа колонки
-                                'Type'		=> 'varchar(40)'// Тип значений колонки
-                    );
-
-	
-					$table_data[] = array(
-								'Field' 	=> 'Active',	// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'Active',	// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> '',			// Тип ключа колонки
-								'Type'		=> 'int(1)'		// Тип значений колонки
-					);
-	
-					$table_data[] = array(
-								'Field' 	=> 'Created',	// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'Created',	// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> '',			// Тип ключа колонки
-								'Type'		=> 'datetime'	// Тип значений колонки
-					);
-	
-					$table_data[] = array(
-								'Field' 	=> 'TS',		// Имя колонки в структуре текущей таблицы
-								'Column' 	=> 'TS',		// Настоящее имя колонки текущей таблицы в общей мега таблице
-								'Key' 		=> '',			// Тип ключа колонки
-								'Type'		=> 'timestamp'	// Тип значений колонки
-					);
-					
-					self::$tables[ $table_id ] = $table_data;
-				}
-
-                // Do not add field if this is supertable(Headers)
-                if ($table_id != 'Headers') {
-                    // Установим связь между названием колонки текущей таблицы и реальной колонкой в общей таблице
-                    self::$tables[ $table_id ][] = array
-                    (
-                            'Field' 	=> $table_column_name,	// Имя колонки в структуре текущей таблицы
-                            'Column' 	=> $row['Column2'],		// Настоящее имя колонки текущей таблицы в общей мега таблице
-                            'Key' 		=> $row['Column4'],		// Тип ключа колонки
-                            'Type'		=> $row['Column3']		// Тип значений колонки
-                    );
-                }
-			}
-		}
-		return self::$tables;
-	}
 	//[PHPCOMPRESSOR(remove,end)]
 	
 	/**

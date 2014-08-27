@@ -120,14 +120,22 @@ class VirtualTable
     }
 
     /**
-     * Fill virtual tables structure in ActiveRecord compliant way
+     * Get virtual tables structure in ActiveRecord compliant way. All virtual
+     * table structure is actually stored in another virtual table @see $metaTable
+     * add this function actually reads its rows and build other virtual tables
+     * structure.
+     *
+     * This method is optimized to perform only one query to the real db and
+     * build all metadata from it results.
+     *
      * @param array $structures Collection where all virtual tables structure
      *                          data will be returned
+     *
      * @return bool True if at least one virtual table has been found
      */
     public function getStructure(& $structures = array())
     {
-        // Build SQL to get meta-table
+        // Build SQL to get meta-table rows
         $sql_result = mysqli_query($this->link, 'SELECT * FROM `'.$this->table.'` WHERE Entity = "'.$this->metaTable.'" AND Active = "1" ORDER BY RowID ASC');
         if (!is_bool($sql_result)) {
             // Load rows from sql response

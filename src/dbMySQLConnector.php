@@ -589,6 +589,7 @@ class dbMySQLConnector implements idbConnector
         $virtualTable->create();
 
         // Get all virtual tables structure data
+        $db_mapper = array();
         $virtualTable->getStructure($db_mapper);
 
 		// Получим информацию о всех таблицах из БД

@@ -64,7 +64,7 @@ class VirtualTable
      * @var array
      */
     protected $defaultColumns = array(
-        array('row_id', 'row_id', 'PRI', 'int(255)'),
+        array('row_id', 'row_id', 'PRI', 'int(255)', 'AUTO_INCREMENT'),
         array('entity_id', 'entity_id', 'UNI', 'varchar(64)'),
         array('material_id', 'material_id', '', 'int(255)'),
         array('entity', 'entity', '', 'varchar(64)'),
@@ -102,39 +102,60 @@ class VirtualTable
      */
     public function newTable($entity, array $tableData)
     {
-        // Build db query to create virtual table metadata
-        $createSQL = 'INSERT INTO `'.$this->table.'` (
-            `'.$this->mainEntityColumn.'`,
-            `'.$this->entityColumn.'`,
-            `'.$this->fieldColumn.'`,
-            `'.$this->realColumn.'`,
-            `'.$this->keyColumn.'`,
-            `'.$this->typeColumn.'`
-        ) VALUES';
+        // Build db query to find if we have created this table already
+        $selectSQL = 'SELECT * FROM `'.$this->table.'`
+        WHERE `'.$this->mainEntityColumn.'` = "'.$this->metaTable.'"
+        AND `'.$this->entityColumn.'` = "'.$entity.'"';
 
-        // Will make single query so will gather all columns insertion in one statement
-        $valuesSQL = array();
+        // Flag if this table is already defined
+        $found = false;
 
-        // Iterate all columns data int table description
-        foreach ($tableData as $columnData) {
-            // Define default insert field values
-            $values = array(
-                '"'.$this->metaTable.'"',   // Meta-table name
-                '"'.$entity.'"'             // New virtual table name
-            );
-
-            // Iterate all passed column data fields
-            for($i = 0; $i < 0; $i++) {
-                // Safely get column metadata and add to values collection
-                $values[] = isset($columnData[$i]) ? '"'.$columnData[$i].'"' : '""';
+        // Perform request
+        $result = mysqli_query($this->link, $selectSQL);
+        if (!is_bool($result)) {
+            // Load rows from sql response
+            while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+                //elapsed('Virtual table ['.$entity.'] is already created');
+                $found = true;
+                break;
             }
-
-            // Build db query to create virtual table column metadata
-            $valuesSQL[] = '('.implode(',', $values).')';
         }
 
-        // Perform db request for creating virtual table metadata
-        mysqli_query($this->link, $createSQL.implode(',', $valuesSQL));
+        if (!$found) {
+            // Build db query to create virtual table metadata
+            $createSQL = 'INSERT INTO `'.$this->table.'` (
+                `'.$this->mainEntityColumn.'`,
+                `'.$this->entityColumn.'`,
+                `'.$this->fieldColumn.'`,
+                `'.$this->realColumn.'`,
+                `'.$this->keyColumn.'`,
+                `'.$this->typeColumn.'`
+            ) VALUES ';
+
+            // Will make single query so will gather all columns insertion in one statement
+            $valuesSQL = array();
+
+            // Iterate all columns data int table description
+            foreach ($tableData as $columnData) {
+                // Define default insert field values
+                $values = array(
+                    '"'.$this->metaTable.'"',   // Meta-table name
+                    '"'.$entity.'"'             // New virtual table name
+                );
+
+                // Iterate all passed column data fields
+                for($i = 0; $i < 4; $i++) {
+                    // Safely get column metadata and add to values collection
+                    $values[] = isset($columnData[$i]) ? '"'.$columnData[$i].'"' : '" "';
+                }
+
+                // Build db query to create virtual table column metadata
+                $valuesSQL[] = '('.implode(',', $values).')';
+            }
+
+            // Perform db request for creating virtual table metadata
+            mysqli_query($this->link, $createSQL.implode(',', $valuesSQL));
+        }
     }
 
     /**

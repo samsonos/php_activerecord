@@ -588,6 +588,13 @@ class dbMySQLConnector implements idbConnector
         // Create real db table if not exists
         $virtualTable->create();
 
+        $virtualTable->newTable('pricelist', array(
+            array('number', 'column0'),
+            array('item', 'column1'),
+            array('price', 'column2'),
+            array('count', 'column3'),
+        ));
+
         // Get all virtual tables structure data
         $db_mapper = array();
         $virtualTable->getStructure($db_mapper);

@@ -26,6 +26,9 @@ class VirtualTable
     /** @var int Maximum amount of available virtual table additional fields */
     public $virtualColumnsCount = 20;
 
+    /** @var string General REAL column name to define entity */
+    public $mainEntityColumn = 'entity';
+
     /**
      * Real db table column name which represents entity in meta-table
      * @var string
@@ -87,6 +90,51 @@ class VirtualTable
 
         // Set main meta-table name
         $this->metaTable = $metaTable;
+    }
+
+    /**
+     * Generic creation of virtual table metadata
+     *
+     * @param       $entity     Virtual table name
+     * @param array $tableData  Virtual table columns structure
+     *
+     * @internal param array $columnData
+     */
+    public function newTable($entity, array $tableData)
+    {
+        // Build db query to create virtual table metadata
+        $createSQL = 'INSERT INTO `'.$this->table.'` (
+            `'.$this->mainEntityColumn.'`,
+            `'.$this->entityColumn.'`,
+            `'.$this->fieldColumn.'`,
+            `'.$this->realColumn.'`,
+            `'.$this->keyColumn.'`,
+            `'.$this->typeColumn.'`
+        ) VALUES';
+
+        // Will make single query so will gather all columns insertion in one statement
+        $valuesSQL = array();
+
+        // Iterate all columns data int table description
+        foreach ($tableData as $columnData) {
+            // Define default insert field values
+            $values = array(
+                '"'.$this->metaTable.'"',   // Meta-table name
+                '"'.$entity.'"'             // New virtual table name
+            );
+
+            // Iterate all passed column data fields
+            for($i = 0; $i < 0; $i++) {
+                // Safely get column metadata and add to values collection
+                $values[] = isset($columnData[$i]) ? '"'.$columnData[$i].'"' : '""';
+            }
+
+            // Build db query to create virtual table column metadata
+            $valuesSQL[] = '('.implode(',', $values).')';
+        }
+
+        // Perform db request for creating virtual table metadata
+        mysqli_query($this->link, $createSQL.implode(',', $valuesSQL));
     }
 
     /**

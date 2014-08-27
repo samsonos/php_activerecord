@@ -588,7 +588,7 @@ class dbMySQLConnector implements idbConnector
         // Create real db table if not exists
         $virtualTable->create();
 
-        // Получим описание относительных таблиц
+        // Get all virtual tables structure data
         $virtualTable->getStructure($db_mapper);
 
 		// Получим информацию о всех таблицах из БД
@@ -641,7 +641,7 @@ class dbMySQLConnector implements idbConnector
 			// Создадим классы
 			foreach ( $db_mapper as $table_name => $table_data ) 
 			{
-				$file_full = $this->classes( self::$tables[ $table_name ], $table_name, 'scmstable', $db_relations );
+				$file_full = $this->classes( self::$tables[ $table_name ], $table_name, $virtualTable->table, $db_relations );
 				$db_classes .= $file_full[0];
 				$db_func .= $file_full[1];
 			}

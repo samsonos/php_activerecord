@@ -588,12 +588,13 @@ class dbMySQLConnector implements idbConnector
         // Create real db table if not exists
         $virtualTable->create();
 
+       /* // Create test table
         $virtualTable->newTable('pricelist', array(
             array('number', 'column0'),
             array('item', 'column1'),
             array('price', 'column2'),
             array('count', 'column3'),
-        ));
+        ));*/
 
         // Get all virtual tables structure data
         $db_mapper = array();
@@ -620,6 +621,8 @@ class dbMySQLConnector implements idbConnector
 		}	
 		
 		$bstr = md5(serialize(self::$tables));
+
+        //TODO: check if virtual table has not changed and add it to hash
 		
 		// Создадим имя файла содержащего пути к модулям
 		$md5_file = __SAMSON_CACHE_PATH.self::CACHE_PATH.'metadata/classes_'.$bstr.'.php';
@@ -649,7 +652,7 @@ class dbMySQLConnector implements idbConnector
 			// Создадим классы
 			foreach ( $db_mapper as $table_name => $table_data ) 
 			{
-				$file_full = $this->classes( self::$tables[ $table_name ], $table_name, $virtualTable->table, $db_relations );
+				$file_full = $this->classes( $table_data, $table_name, $virtualTable->table, $db_relations );
 				$db_classes .= $file_full[0];
 				$db_func .= $file_full[1];
 			}

@@ -205,7 +205,7 @@ class VirtualTable
     public function getStructure(& $structures = array())
     {
         // Build SQL to get meta-table rows
-        $sql_result = mysqli_query($this->link, 'SELECT * FROM `'.$this->table.'` WHERE Entity = "'.$this->metaTable.'" AND Active = "1" ORDER BY RowID ASC');
+        $sql_result = mysqli_query($this->link, 'SELECT * FROM `'.$this->table.'` WHERE `'.$this->mainEntityColumn.'` = "'.$this->metaTable.'" AND active = "1"');
         if (!is_bool($sql_result)) {
             // Load rows from sql response
             while ($row = mysqli_fetch_array($sql_result, MYSQL_ASSOC)) {

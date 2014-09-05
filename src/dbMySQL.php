@@ -687,10 +687,6 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	private function & toRecords( $class_name, array & $response, array $join = array(), array $virtual_fields = array() )
 	{
-        //[PHPCOMPRESSOR(remove,start)]
-        s()->benchmark( __FUNCTION__, func_get_args(), __CLASS__ );
-        //[PHPCOMPRESSOR(remove,end)]
-
 		// Сформируем правильное имя класса		
 		$class_name = ns_classname( $class_name, 'samson\activerecord');
 		

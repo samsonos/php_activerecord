@@ -40,7 +40,6 @@ class ActiveRecordConnector extends CompressableExternalModule
 	/** @see \samson\core\CompressableExternalModule::afterCompress() */
 	public function afterCompress( & $obj = null, array & $code = null )
 	{
-        trace($this->cache_path.'metadata');
 		// Iterate through generated php code
         $files = array();
 		foreach (\samson\core\File::dir($this->cache_path.'metadata', 'php', '', $files, 1 ) as $file) {

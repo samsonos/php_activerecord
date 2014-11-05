@@ -435,10 +435,10 @@ class dbMySQLConnector implements idbConnector
 	}
 	
 	/** Generate database table relations */
-	public function relations()
+	public function relations($cachePath = '')
 	{
 		// Generate unique file name
-		$relations_file = __SAMSON_CACHE_PATH.self::CACHE_PATH.'/relations/'.md5(serialize(TableRelation::$instances)).'.php';
+		$relations_file = $cachePath.self::CACHE_PATH.'/relations/'.md5(serialize(TableRelation::$instances)).'.php';
 				
 		// Relations file does not exists - create it
 		if( !file_exists($relations_file))
@@ -577,7 +577,7 @@ class dbMySQLConnector implements idbConnector
 	 * Generate ORM classes 
 	 * @param string $force Force class generation
 	 */
-	public function generate( $force = false )
+	public function generate($force = false, $cachePath = '')
 	{		
 		// Processed permanent table relations
 		$db_relations = array();
@@ -625,8 +625,8 @@ class dbMySQLConnector implements idbConnector
         //TODO: check if virtual table has not changed and add it to hash
 		
 		// Создадим имя файла содержащего пути к модулям
-		$md5_file = __SAMSON_CACHE_PATH.self::CACHE_PATH.'metadata/classes_'.$bstr.'.php';
-		$md5_file_func = __SAMSON_CACHE_PATH.self::CACHE_PATH.'metadata/func_'.$bstr.'.php';
+		$md5_file = $cachePath.self::CACHE_PATH.'metadata/classes_'.$bstr.'.php';
+		$md5_file_func = $cachePath.self::CACHE_PATH.'metadata/func_'.$bstr.'.php';
 
 		// Если еще не создан отпечаток базы данных - создадим его
 		if ( !file_exists( $md5_file ) || $force )

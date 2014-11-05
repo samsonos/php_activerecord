@@ -93,7 +93,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 		}
 		
 		// Generate db table classes
-		db()->generate();				
+		db()->generate(false, $this->cache_path);
 	}
 
 	/** @see \samson\core\ExternalModule::init() */
@@ -114,7 +114,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 
 		//[PHPCOMPRESSOR(remove,start)]
 		// Generate table relations
-		db()->relations();
+		db()->relations($this->cache_path);
 		//[PHPCOMPRESSOR(remove,end)]
 	}
 }

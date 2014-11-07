@@ -43,36 +43,36 @@ class RelationData
 	public function __construct( $base_class, $table_name_simple, $relation_class = null, $ignore = false )
 	{				
 		// If table name passed without namespace consider it as activerecord namespace
-		$table_name = strtolower(ns_classname( $table_name_simple, 'samson\activerecord'));
-		
+		$table_name = \samson\core\AutoLoader::className( $table_name_simple, 'samson\activerecord');
+
 		// If relation class not specified
-		if( !isset( $relation_class ) )
-		{			
+		if (!isset($relation_class)) {
 			// if there is no class exists for table name specified
-			if( !class_exists($table_name, false) )
-			{
+			if (!class_exists($table_name, false)) {
 				// PHP < 5.3 get relation aliases
 				eval('$_relation_alias = '.$base_class.'::$_relation_alias;');
 					
 				// Try to find classname in relation aliases
-                if( isset($_relation_alias[ $table_name_simple ])) $relation_class = ns_classname( $_relation_alias[ $table_name_simple ], __NAMESPACE__);
-                else if( isset($_relation_alias[ $table_name ])) $relation_class = ns_classname( $_relation_alias[ $table_name ], __NAMESPACE__);
-				else { // use thi table name as class
+                if( isset($_relation_alias[ $table_name_simple ])) {
+                    $relation_class = \samson\core\AutoLoader::className($_relation_alias[ $table_name_simple ], __NAMESPACE__);
+                } else if (isset($_relation_alias[ $table_name ])) {
+                    $relation_class = \samson\core\AutoLoader::className($_relation_alias[ $table_name ], __NAMESPACE__);
+                } else { // use thi table name as class
                     $relation_class = $table_name;
                 }
 			}
 			// Relation class name equals to table name
 			else $relation_class = $table_name;
-			
+
 			// Try to find closest parent class to dbRecord class
 			$parent_class = get_parent_class( $relation_class );
-			if( $parent_class != ns_classname( 'dbRecord', 'samson\activerecord')) $table_name = classname($parent_class);
+			if( $parent_class != \samson\core\AutoLoader::className( 'dbRecord', 'samson\activerecord')) $table_name = \samson\core\AutoLoader::getOnlyClass($parent_class);
 		}			
 			
 		// Set defined class fields
 		$this->base = $base_class;
 		$this->relation = $relation_class;
-		$this->table = classname( $table_name );
+		$this->table = \samson\core\AutoLoader::getOnlyClass( $table_name );
         $this->ignore = $ignore;
 	
 		// TODO: fix this problem

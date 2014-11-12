@@ -396,7 +396,7 @@ class dbQuery extends Query //implements idbQuery
 	/** @see idbQuery::order_by() */
 	public function order_by( $field, $direction = 'ASC' )
 	{
-		$this->order = array( $field, $direction );
+		$this->order[] = array( $field, $direction );
 	
 		// Вернем себя для цепирования
 		return $this;

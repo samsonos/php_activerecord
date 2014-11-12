@@ -475,7 +475,18 @@ class dbMySQL extends dbMySQLConnector implements idb
 		// Добавим нужные сортировщики
 		if( sizeof( $query->group )) $sql .= "\n".' GROUP BY '.$query->group[0];
 		// Если указана сортировка результатов
-		if( sizeof( $query->order )) $sql .= "\n".' ORDER BY '.$query->order[0].' '.$query->order[1];
+		if( sizeof( $query->order )) {
+            $sql .= "\n".' ORDER BY ';
+            for ($i=0;$i<sizeof($query->order); $i++) {
+                $item = &$query->order[$i];
+                if (sizeof($item)) {
+                    $sql .= $item[0].' '.$item[1];
+                }
+                if ($i<(sizeof($query->order)-1)) {
+                    $sql .= ', ';
+                }
+            }
+        }
 		// Если нужно ограничить к-во записей в выдаче по главной таблице
 		if( sizeof( $query->limit )) $sql .= "\n".' LIMIT '.$query->limit[0].(isset($query->limit[1])?','.$query->limit[1]:'');
 		

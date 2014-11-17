@@ -27,7 +27,7 @@ class Record implements \samson\core\iModuleViewable, \ArrayAccess
         foreach (get_object_vars($this) as $var => $value) {
             // Если это не системное поле записи - запишем его значение
             if (!in_array($var, $restricted)) {
-                $values[ $prefix.$var ] = trim($value);
+                $values[ $prefix.$var ] = is_string($value) ? trim($value) : $value;
             }
         }
 

@@ -56,7 +56,11 @@ class Query extends QueryHandler
 	public function fields( $field_name, & $return = null ){ $args = func_num_args() - 1; return $this->execute( $return, $args, null, array( $this, '_toFieldArray'), array($field_name) );  }
 
     // TODO: Comment? WTF?
-    public function fieldsNew( $field_name, & $return = null ){
+    public function fieldsNew( $field_name, & $return = null )
+    {
+        // Call handlers stack
+        $this->_callHandlers();
+
         $args = func_num_args() - 1;
         // Perform DB request
         $return = db()->findFields( $this->class_name, $this,  $field_name);

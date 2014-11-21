@@ -9,7 +9,7 @@ namespace samson\activerecord;
 class Record implements \samson\core\iModuleViewable, \ArrayAccess
 {
     /** Collection of class fields that would not be passed to module view */
-    public static $restricted = array( 'attached', 'onetoone', 'onetomany', 'class_name' );
+    public static $restricted = array('attached', 'onetoone', 'onetomany', 'class_name');
 
     /** Record primary field value - identifier */
     public $id;
@@ -33,6 +33,38 @@ class Record implements \samson\core\iModuleViewable, \ArrayAccess
 
         // Вернем массив атрибутов представляющий запись БД
         return $values;
+    }
+
+    /**
+     * Create full entity copy from
+     * @param mixed $object Variable to return copied object
+     * @return Record New copied object
+     */
+    public function & copy(&$object = null)
+    {
+        // Get current entity class
+        $entity = get_class($this);
+
+        // Create object instance
+        $object = new $entity(false);
+
+        // Check if this instance has static attributes set
+        if (property_exists($entity, self::$_attributes)) {
+            // Iterate all object attributes
+            foreach (self::$_attributes as $attribute) {
+                // If we have this attribute set
+                if (isset($this[$attribute])) {
+                    // Store it in copied object
+                    $object[$attribute] = $this[$attribute];
+                }
+            }
+        }
+
+        // Save object in database
+        $object->save();
+
+        // Return created copied object
+        return $object;
     }
 
     /** @see ArrayAccess::offsetSet() */

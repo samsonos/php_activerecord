@@ -48,15 +48,17 @@ class Record implements \samson\core\iModuleViewable, \ArrayAccess
         // Create object instance
         $object = new $entity(false);
 
-        // Check if this instance has static attributes set
-        if (property_exists($entity, self::$_attributes)) {
-            // Iterate all object attributes
-            foreach (self::$_attributes as $attribute) {
-                // If we have this attribute set
-                if (isset($this[$attribute])) {
-                    // Store it in copied object
-                    $object[$attribute] = $this[$attribute];
-                }
+        // PHP 5.2 compliant get attributes
+        $attributes = array();
+        eval('$attributes = '.$entity.'::$_attributes;');
+
+
+        // Iterate all object attributes
+        foreach ($attributes as $attribute) {
+            // If we have this attribute set
+            if (isset($this[$attribute])) {
+                // Store it in copied object
+                $object[$attribute] = $this[$attribute];
             }
         }
 

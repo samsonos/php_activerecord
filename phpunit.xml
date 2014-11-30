@@ -11,22 +11,22 @@
          syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="SamsonCMS Api Test Case">
+        <testsuite name="SamsonPHP Test Case">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
+
+    <logging>
+            <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">.</directory>
             <exclude>
-                <directory suffix=".php">./vendor</directory>
-		<directory suffix=".php">./tests</directory>
+                <directory suffix=".php">vendor</directory>
+				<directory suffix=".php">tests</directory>
             </exclude>
         </whitelist>
     </filter>
-    
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
 </phpunit>

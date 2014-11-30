@@ -1,6 +1,7 @@
 {
     "name":"samsonos/php_activerecord",
     "author":"Vitaly Iegorov <egorov@samsonos.com>",
+    "minimum-stability":"dev",
     "require":
     {
         "samsonos/php_core":"*"

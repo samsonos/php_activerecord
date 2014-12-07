@@ -1,10 +1,23 @@
 {
     "name":"samsonos/php_activerecord",
-    "author":"Vitaly Iegorov <egorov@samsonos.com>",
+    "authors":[
+		{
+            "name":"Vitaly Iegorov",
+            "email":"egorov@samsonos.com"
+        },
+        {
+            "name":"Nikita Kotenko",
+            "email":"kotenko@samsonos.com"
+        }
+    ],
     "minimum-stability":"dev",
     "require":
     {
         "samsonos/php_core":"*"
+    },
+	"require-dev": {
+        "satooshi/php-coveralls": "dev-master",
+        "phpunit/phpunit": "4.*"
     },
     "license":"Open Software License (OSL) v 3.0",
     "homepage":"http://samsonos.com/",

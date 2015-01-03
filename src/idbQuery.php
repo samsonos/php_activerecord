@@ -32,7 +32,7 @@ interface idbQuery
 	 * @param mixed 	$value		Значение атрибута в условии запроса
 	 * @return idbQuery Указатель на самого себя для цепирования	 
 	 */
-	public function cond( $attribute, $value = '', $relation = dbRelation::EQUAL );
+	public function cond( $attribute, $value = null, $relation = dbRelation::EQUAL );
 
     /**
      * Join table to query

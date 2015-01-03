@@ -311,7 +311,7 @@ class dbQuery extends Query //implements idbQuery
 	public function where( $condition ){ return $this->cond($condition, '', dbRelation::OWN ); }
 	
 	/**	 @see idbQuery::cond() */
-	public function cond( $attribute, $value = '', $relation = dbRelation::EQUAL )
+	public function cond( $attribute, $value = null, $relation = dbRelation::EQUAL )
 	{			
 		// Установим общую группу условий
 		$destination = & $this->cConditionGroup;	

@@ -49,6 +49,8 @@ class dbQuery extends Query //implements idbQuery
 	/** Virtual fields */
 	public $virtual_fields = array();
 
+	public $empty = false;
+
     /** @var bool True to show requests */
     protected $debug = false;
 	
@@ -314,14 +316,17 @@ class dbQuery extends Query //implements idbQuery
 	public function cond( $attribute, $value = null, $relation = dbRelation::EQUAL )
 	{
 		// Установим общую группу условий
-		$destination = & $this->cConditionGroup;	
-		 
+		$destination = & $this->cConditionGroup;
+
 		// Если передана строка как атрибут
 		if (is_string($attribute)) {
             // If value is not set or an empty array
-            if (!isset($value) || (is_array($value) && !sizeof($value))) {
+            if (!isset($value)) {
 	            $relation = dbRelation::ISNULL;
 	            $value = '';
+            } elseif (is_array($value) && !sizeof($value)) {
+	            $this->empty = true;
+	            return $this;
             }
 			// Создадим аргумент условия
 			$attribute = new dbConditionArgument($attribute, $value, $relation);

@@ -258,6 +258,9 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	public function & find( $class_name, dbQuery $query )
 	{
+		if ($query->empty) {
+			return array();
+		}
 		// Get SQL
 		$sql = $this->prepareSQL($class_name, $query);
 
@@ -291,16 +294,17 @@ class dbMySQL extends dbMySQLConnector implements idb
      */
     public function & findFields($class_name, dbQuery $query, $field)
     {
-        // If field is not an array
-        if (!is_array($field)) {
-            $fields = array();
-        }
+	    $result = array();
+	    if ($query->empty) {
+		    return $result;
+	    }
 
         // Get SQL
         $sql = $this->prepareSQL($class_name, $query);
+
         // Выполним запрос к БД
         $sql_result = mysqli_query($this->link, $sql ) or e( mysqli_error( $this->link ), E_SAMSON_SQL_ERROR );
-        $result = array();
+
 
         // Если нам вернулся ресурс
         if( !is_bool($sql_result)) {

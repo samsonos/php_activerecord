@@ -312,25 +312,27 @@ class dbQuery extends Query //implements idbQuery
 	
 	/**	 @see idbQuery::cond() */
 	public function cond( $attribute, $value = null, $relation = dbRelation::EQUAL )
-	{			
+	{
 		// Установим общую группу условий
 		$destination = & $this->cConditionGroup;	
 		 
 		// Если передана строка как атрибут
 		if (is_string($attribute)) {
-            // If value is set and not an array or not an empty array
-            if (isset($value) && (!is_array($value) || (is_array($value) && sizeof($value)))) {
-                // Создадим аргумент условия
-                $attribute = new dbConditionArgument($attribute, $value, $relation);
-
-                // Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
-                if (property_exists($this->class_name, $attribute->field)) {
-                    $destination = &$this->own_condition;
-                }
-
-                // Добавим аргумент условия в выбранную группу условий
-                $destination->arguments[] = $attribute;
+            // If value is not set or an empty array
+            if (!isset($value) || (is_array($value) && !sizeof($value))) {
+	            $relation = dbRelation::ISNULL;
+	            $value = '';
             }
+			// Создадим аргумент условия
+			$attribute = new dbConditionArgument($attribute, $value, $relation);
+
+			// Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
+			if (property_exists($this->class_name, $attribute->field)) {
+				$destination = &$this->own_condition;
+			}
+
+			// Добавим аргумент условия в выбранную группу условий
+			$destination->arguments[] = $attribute;
 		}				
 		// If condition group is passed
 		else if( is_a( $attribute, ns_classname('Condition','samson\activerecord')) )

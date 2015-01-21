@@ -161,7 +161,7 @@ class dbMySQLConnector implements idbConnector
 			foreach ( $class_data as & $column )
 			{
 				// Если это главный ключ таблицы запишем его в специальную переменную
-				if( $column['Key'] == 'PRI' ) 
+				if( $column['Key'] == 'PRI'  && $primary_field == '') 
 				{
 					$class_eval .= "\n\t".'/** Название ключевого поля таблицы */';
 					$class_eval .= "\n\t".'public static $_primary = "'.$column['Field'].'";';

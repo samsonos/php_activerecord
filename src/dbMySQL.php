@@ -258,18 +258,18 @@ class dbMySQL extends dbMySQLConnector implements idb
 	 */
 	public function & find( $class_name, dbQuery $query )
 	{
+		// Результат выполнения запроса
+		$result = array();
+		
 		if ($query->empty) {
-			return array();
+			return $result;
 		}
+		
 		// Get SQL
 		$sql = $this->prepareSQL($class_name, $query);
 
 		// Выполним запрос к БД					
 		$db_data = $this->query( $sql );
-		
-			
-		// Результат выполнения запроса
-		$result = array();
 		
 		//trace($query->virtual_fields);
 		

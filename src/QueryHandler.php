@@ -1,12 +1,14 @@
 <?php
 namespace samson\activerecord;
 
+use samsonframework\orm\QueryInterface;
+
 /**
  * Class for saving external query handlers
  * @author Vitaly Iegorov <egorov@samsonos.com>
  * @version 2.0
  */
-class QueryHandler
+class QueryHandler implements QueryInterface
 {
 	/** Collection of external query handlers(callbacks) */
 	private $handlers = array();

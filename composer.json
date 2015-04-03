@@ -16,6 +16,7 @@
         "samsonos/php_core":"*"
     },
 	"require-dev": {
+        "samsonphp/generator":"*",
         "satooshi/php-coveralls": "dev-master",
         "phpunit/phpunit": "4.*"
     },

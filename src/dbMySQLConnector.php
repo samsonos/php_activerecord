@@ -2,7 +2,7 @@
 namespace samson\activerecord;
 
 //[PHPCOMPRESSOR(remove,start)]
-use samson\core\Generator;
+use samsonphp\generator\Generator;
 //[PHPCOMPRESSOR(remove,end)]
 use samson\core\File;
 
@@ -466,7 +466,9 @@ class dbMySQLConnector implements idbConnector
 				// Save relation data
 				$db_relations[ $row->parent ][ $child_relation ] = $row;
 			}
-			
+
+            // TODO: Pass generator and others via constructor DI
+
 			// Create code generator instance
 			$g = new Generator('samson\activerecord');
 			$g->multicomment(array('Static ActiveRecord generated table relations'));	

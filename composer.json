@@ -13,10 +13,10 @@
     "minimum-stability":"dev",
     "require":
     {
-        "samsonos/php_core":"*"
+        "samsonos/php_core":"*",
+        "samsonphp/generator":"*"
     },
 	"require-dev": {
-        "samsonphp/generator":"*",
         "satooshi/php-coveralls": "dev-master",
         "phpunit/phpunit": "4.*"
     },

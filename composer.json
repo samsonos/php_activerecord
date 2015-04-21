@@ -1,32 +1,32 @@
 {
-    "name":"samsonos/php_activerecord",
-    "authors":[
-		{
-            "name":"Vitaly Iegorov",
-            "email":"egorov@samsonos.com"
-        },
-        {
-            "name":"Nikita Kotenko",
-            "email":"kotenko@samsonos.com"
-        }
-    ],
-    "minimum-stability":"dev",
-    "require":
+  "name": "samsonos/php_activerecord",
+  "authors": [
     {
-        "samsonos/php_core":"*",
-        "samsonphp/generator":"*"
+      "name": "Vitaly Iegorov",
+      "email": "egorov@samsonos.com"
     },
-	"require-dev": {
-        "satooshi/php-coveralls": "dev-master",
-        "phpunit/phpunit": "4.*"
-    },
-    "license":"Open Software License (OSL) v 3.0",
-    "homepage":"http://samsonos.com/",
-    "autoload": {
-        "classmap": ["src/"],
-        "psr-0": {
-            "samsonos\\activerecord\\": "src/"
-        },
-        "files": ["src/global.php"]
+    {
+      "name": "Nikita Kotenko",
+      "email": "kotenko@samsonos.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "samsonframework/base": "*",
+    "samsonos/php_core": "*",
+    "samsonphp/generator": "*"
+  },
+  "require-dev": {
+    "satooshi/php-coveralls": "dev-master",
+    "phpunit/phpunit": "4.*"
+  },
+  "license": "Open Software License (OSL) v 3.0",
+  "homepage": "http://samsonos.com/",
+  "autoload": {
+    "classmap": ["src/"],
+    "psr-0": {
+      "samsonos\\activerecord\\": "src/"
+    },
+    "files": ["src/global.php"]
+  }
 }

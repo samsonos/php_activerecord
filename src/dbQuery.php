@@ -535,29 +535,24 @@ class dbQuery extends Query //implements idbQuery
      * Function to reconfigure dbQuery to work with multiple Entities
      *
      * @param string $className Entity name
-     * @return self Chaining
+     * @return self|string Chaining or current class name if nothing is passed
      */
-    public function className($className)
+    public function className($className = null)
     {
-//        // Создадим общую условную группу
-//        $this->condition = new Condition();
-//
-//        // Установим указатель на текущую группу условий
-//        $this->cConditionGroup = &$this->condition;
-//
-//        // Создадим собственную условную группу
-//        $this->own_condition = new Condition();
+        if (!func_num_args()) {
+            return $this->class_name;
+        } else {
+            $this->flush();
 
-        $this->flush();
+            if (isset($className)) {
+                // Сформируем правильное имя класса
+                $className = ns_classname($className, 'samson\activerecord');
+                // Установим имя класса для запроса
+                $this->class_name = $className;
+            }
 
-        if (isset($className)) {
-            // Сформируем правильное имя класса
-            $className = ns_classname($className, 'samson\activerecord');
-            // Установим имя класса для запроса
-            $this->class_name = $className;
+            return $this;
         }
-
-        return $this;
     }
 
     // Magic method after-clonning

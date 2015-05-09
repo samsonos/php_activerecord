@@ -13,6 +13,7 @@
   "minimum-stability": "dev",
   "require": {
     "samsonframework/base": "*",
+    "samsonframework/orm": "*",
     "samsonos/php_core": "*",
     "samsonphp/generator": "*"
   },

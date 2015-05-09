@@ -1,10 +1,12 @@
 <?php 
 namespace samson\activerecord;
 
+use samsonframework\orm\Database;
+use samson\core\File;
+
 //[PHPCOMPRESSOR(remove,start)]
 use samsonphp\generator\Generator;
 //[PHPCOMPRESSOR(remove,end)]
-use samson\core\File;
 
 /**
  * Класс описывающий подключение к серверу MySQL
@@ -12,7 +14,7 @@ use samson\core\File;
  * @author Nikita Kotenko <nick.w2r@gmail.com>
  *
  */
-class dbMySQLConnector implements idbConnector
+class dbMySQLConnector extends Database implements idbConnector
 {
 	/** Table name prefix */
 	public static $prefix = '';

@@ -69,13 +69,7 @@ class ActiveRecordConnector extends CompressableExternalModule
 		dbMySQLConnector::$prefix = $this->prefix;
 		
 		// Connect to database
-		db()->connect(array(
-			'name'  => $this->name,
-			'login' => $this->login,
-			'pwd'   => $this->pwd,
-			'host'  => $this->host,
-            'port'  => $this->port
-		));		
+		db()->connect($this->name, $this->login, $this->pwd, $this->host, $this->port);
 		
 		// Create specific relations
 		foreach ( $this->relations as $args )
@@ -101,14 +95,8 @@ class ActiveRecordConnector extends CompressableExternalModule
 
 		// Set table prefix
 		dbMySQLConnector::$prefix = $this->prefix;
-		
-		// Connect to database
-		db()->connect(array(
-			'name' => $this->name, 
-			'login'=> $this->login, 
-			'pwd' =>  $this->pwd,
-			'host' =>  $this->host
-		));	
+
+        db()->connect($this->name, $this->login, $this->pwd, $this->host, $this->port);
 
 		//[PHPCOMPRESSOR(remove,start)]
 		// Generate table relations

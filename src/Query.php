@@ -70,8 +70,8 @@ class Query extends QueryHandler
     /**
      * Perform database request and get array of record field values
      * @see \samson\activerecord\Query::execute()
-     * @param string $fieldName 	Record field name to get value from
-     * @param string $return		External variable to store query results
+     * @param string $fieldName Record field name to get value from
+     * @param string $return External variable to store query results
      * @return Ambigous <boolean, NULL, mixed>
      */
     public function fields($fieldName, & $return = null)
@@ -118,11 +118,11 @@ class Query extends QueryHandler
     /**
      * Perform database request and return different results depending on function arguments.
      * @see \samson\activerecord\Record
-     * @param array 	    $result 		External variable to store dabatase request results collection
-     * @param integer|bool 	$rType			Amount of arguments passed to parent function
-     * @param integer 	    $limit			Quantity of records to return
-     * @param callable	    $handler 		External callable handler for results modification
-     * @param array		    $handlerArgs 	External callable handler arguments
+     * @param array $result External variable to store dabatase request results collection
+     * @param integer|bool $rType Amount of arguments passed to parent function
+     * @param integer $limit Quantity of records to return
+     * @param callable $handler External callable handler for results modification
+     * @param array $handlerArgs External callable handler arguments
      * @return boolean/array Boolean if $r_type > 0, otherwise array of request results
      */
     protected function & execute(
@@ -174,20 +174,5 @@ class Query extends QueryHandler
         } else { // Parent function has no arguments, return request result
             return $result;
         }
-    }
-
-    /**
-     * Convert records array to array of record field values
-     * @param   array 	$records	Records collection
-     * @param   string 	$fieldName	Record field name to collect value from
-     * @return array Collection of record field values
-     */
-    protected function _toFieldArray(array $records, $fieldName)
-    {
-        $return = array();
-        foreach ($records as $record) {
-            $return[] = $record->$fieldName;
-        }
-        return $return;
     }
 }

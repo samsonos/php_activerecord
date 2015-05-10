@@ -451,54 +451,7 @@ class dbMySQL extends dbMySQLConnector
         }
     }
 
-    /**
-     * Получить "правильную" коллекцию полей для формирования запроса к БД
-     *
-     * @param string $class_name Имя класса
-     * @param idbRecord $object Объект для которого формируется список полей
-     * @param boolean $straight Флаг вывода массива вида: КЛЮЧ = ЗНАЧЕНИЕ
-     */
-    protected function & getQueryFields($class_name, & $object = null, $straight = false)
-    {
-        // Получим переменные для запроса
-        extract($this->__get_table_data($class_name));
 
-        // Результирующая коллекция
-        $collection = array();
-
-        // Установим флаг получения значений атрибутов из переданного объекта
-        $use_values = isset($object);
-
-        // Получим имя таблицы где хранится сущность
-        $table = $_table_name;
-
-        // Переберем "настоящее" имена атрибутов схемы данных для объекта
-        foreach ($_table_attributes as $attribute => $map_attribute) {
-            // Отметки времени не заполняем
-            if ($_types[$attribute] == 'timestamp') {
-                continue;
-            }
-
-            // Основной ключ не заполняем
-            if ($_primary == $attribute) {
-                continue;
-            }
-
-            // Получим значение атрибута объекта защитив от инъекций, если объект передан
-            $value = $use_values ? $this->protectQueryValue($object->$map_attribute) : '';
-
-            // Добавим значение поля, в зависимости от вида вывывода метода
-            $collection[$map_attribute] = ($straight ? $table . '.' . $map_attribute . '=' : '') . $value;
-        }
-
-        // Если схема данных работает через "Маппинг" подставим имя сущности для запроса
-        // только в том случаи, если это не прямой запрос к общей таблице "Маппинга"
-        //if( $scheme->has('Entity') && ($scheme->entity_name != 'scmstable') )
-        //	$collection['Entity'] = ($straight ? $table.'.Entity'.'=':'').'"'.$scheme->entity_name.'"';
-
-        // Вернем полученную коллекцию
-        return $collection;
-    }
 
     /**
      * Create object instance by specified parameters
@@ -519,7 +472,7 @@ class dbMySQL extends dbMySQLConnector
         if (!isset(dbRecord::$instances[$className][$identifier]) || isset($dbData['__Count']) || sizeof($virtualFields)) {
 
             // Create empry dbRecord ancestor and store it to cache
-            dbRecord::$instances[$className][$identifier] = new $className(false);
+            dbRecord::$instances[$className][$identifier] = new $className();
 
             // Pointer to object
             $object = &dbRecord::$instances[$className][$identifier];

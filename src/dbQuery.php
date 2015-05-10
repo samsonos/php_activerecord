@@ -278,7 +278,7 @@ class dbQuery extends Query //implements idbQuery
     public function or_($relation = 'OR')
     {
         // Получим либо переданную группу условий, либо создадим новую, потом добавим её в массив групп условий запроса
-        $cond_group = new dbConditionGroup($relation);
+        $cond_group = new Condition($relation);
 
         // Установим текущую группу условий с которой работает запрос
         $this->cConditionGroup = &$cond_group;
@@ -358,7 +358,7 @@ class dbQuery extends Query //implements idbQuery
                 return $this;
             }
             // Создадим аргумент условия
-            $attribute = new dbConditionArgument($attribute, $value, $relation);
+            $attribute = new Argument($attribute, $value, $relation);
 
             // Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
             if (property_exists($this->class_name, $attribute->field)) {

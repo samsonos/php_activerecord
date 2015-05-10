@@ -7,7 +7,7 @@ use samsonframework\orm\Record;
  * Отражение записи БД в PHP
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
  * @author Nikita Kotenko <nick.w2r@gmail.com>
- *
+ * @deprecated use \samsonframework\orm\Record
  */
 class dbRecord extends Record
 {

@@ -8,11 +8,10 @@ namespace samson\activerecord;
  * Класс собирает в себя все необходимые параметры для 
  * формирования "правильного" запроса на самом низком уровне
  * работы с БД
- * @see idb
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com> 
  *
  */
-class dbQuery extends Query //implements idbQuery
+class dbQuery extends \samsonframework\orm\Query
 {
     /**
      * Указатель на текущую группу условий с которой работает запрос
@@ -389,6 +388,12 @@ class dbQuery extends Query //implements idbQuery
 
         // Вернем себя для цепирования
         return $this;
+    }
+
+    /** @deprecated Use self::fields() */
+    public function fieldsNew($fieldName, & $return = null)
+    {
+        return call_user_func_array(array($this, 'fields'), func_get_args());
     }
 
     /** @see idbQuery::join() */

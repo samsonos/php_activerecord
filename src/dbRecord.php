@@ -13,6 +13,6 @@ class dbRecord extends Record
 {
     public function __construct($id = false, $className = null, $database = null)
     {
-        parent::__construct($className, $database);
+        parent::__construct($database);
     }
 }

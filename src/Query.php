@@ -76,11 +76,25 @@ class Query extends QueryHandler
      */
     public function fields($fieldName, & $return = null)
     {
+        // Call handlers stack
+        $this->_callHandlers();
+
         $args = func_num_args() - 1;
-        return $this->execute($return, $args, null, array($this, '_toFieldArray'), array($fieldName));
+
+        // Perform DB request
+        $return = db()->fetchColumn($this->class_name, $this, $fieldName);
+
+        $success = is_array($return) && sizeof($return);
+
+        // If parent function has arguments - consider them as return value and return request status
+        if ($args > 0) {
+            return $success;
+        } else { // Parent function has no arguments, return request result
+            return $return;
+        }
     }
 
-    // TODO: Comment? WTF?
+    /** @deprecated Use self::fields() */
     public function fieldsNew($fieldName, & $return = null)
     {
         // Call handlers stack
@@ -89,7 +103,7 @@ class Query extends QueryHandler
         $args = func_num_args() - 1;
 
         // Perform DB request
-        $return = db()->findFields($this->class_name, $this, $fieldName);
+        $return = db()->fetchColumn($this->class_name, $this, $fieldName);
 
         $success = is_array($return) && sizeof($return);
 

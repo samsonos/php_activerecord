@@ -245,15 +245,17 @@ class dbQuery extends Query //implements idbQuery
     public function flush()
     {
         // Очистим параметры запроса
-        $this->condition = array();
+        $this->condition = new Condition();
         $this->limit = array();
         $this->order = array();
         $this->group = array();
         $this->join = array();
 
-        $this->own_condition = new dbConditionGroup();
-
-        $this->condition = new dbConditionGroup();
+        $this->own_condition = new Condition();
+        $this->own_group = array();
+        $this->own_virtual_fields = array();
+        $this->own_limit = array();
+        $this->own_order = array();
 
         $this->cConditionGroup = &$this->condition;
     }

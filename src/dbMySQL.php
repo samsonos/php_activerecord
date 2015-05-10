@@ -119,34 +119,6 @@ class dbMySQL extends dbMySQLConnector
         );
     }
 
-    /** Count query result */
-    public function count($class_name, dbQuery $query)
-    {
-        // Get SQL
-        $sql = 'SELECT Count(*) as __Count FROM (' . $this->prepareSQL($class_name, $query) . ') as __table';
-        // Выполним запрос к БД
-        $db_data = $this->query($sql);
-
-        return $db_data[0]['__Count'];
-    }
-
-    /** Count query result */
-    public function innerCount($class_name, dbQuery $query)
-    {
-        $params = $this->__get_table_data($class_name);
-
-        // Get SQL
-        $sql = 'SELECT Count(*) as __Count FROM (' . $this->prepareInnerSQL($class_name, $query,
-                $params) . ') as __table';
-
-        // Выполним запрос к БД
-        //$this->debug();
-        $db_data = $this->query($sql);
-        //$this->debug(false);
-
-        return $db_data[0]['__Count'];
-    }
-
     /**
      * @see idb::find()
      */
@@ -272,6 +244,21 @@ class dbMySQL extends dbMySQLConnector
         // Сформируем строку профайлинга
         return 'DB: ' . round($this->elapsed,
             3) . 'с, ' . $this->query_count . ' запр., ' . $total_obj_count . ' об.(' . implode($list, ',') . ')';
+    }
+
+    /** Count query result */
+    public function innerCount($className, $query)
+    {
+        $params = $this->__get_table_data($className);
+
+        // Get SQL
+        $sql = 'SELECT Count(*) as __Count FROM (' .
+            $this->prepareInnerSQL($className, $query, $params) .
+            ') as __table';
+
+        $result = $this->query($sql);
+
+        return $result[0]['__Count'];
     }
 
     //

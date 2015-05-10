@@ -205,30 +205,6 @@ class dbMySQL extends dbMySQLConnector
         return $ret;
     }
 
-    public function & find_by_field($class_name, $field, $value)
-    {
-        // Получим переменные для запроса
-        extract($this->__get_table_data($class_name));
-
-        // Выполним запрос к БД
-        $record_data = $this->query('SELECT ' . $_sql_select['this'] . ' FROM ' . $_sql_from['this'] . ' WHERE ' . $_table_name . '.' . $field . ' = "' . $value . '"');
-
-        // Если запрос выполнился успешно и получена минимум 1-на запись из БД - создадим объект-запись из неё
-        $db_records = $this->toRecords($class_name, $record_data);
-
-        // Переменная для возврата
-        $ret = null;
-
-        // Если мы получили 1ю запись то вернем её
-        if (sizeof($db_records) >= 1) {
-            $ret = array_shift($db_records);
-        }
-
-        // Вернем переменную
-        return $ret;
-    }
-
-
     /**
      * Generic database migration handler
      * @param string $classname Class for searching migration methods

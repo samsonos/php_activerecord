@@ -6,34 +6,7 @@ namespace samson\activerecord;
  * @author Vitaly Iegorov <egorov@samsonos.com>
  * @version 2.0
  */
-class Argument
+class Argument extends \samsonframework\orm\Argument
 {
-	/** Query condition field name */
-	public $field = '';
-	
-	/** Query condition field value */
-	public $value;
-	
-	/**
-	 * Query argument relation beetween field and value
-	 * @var dbRelation
-	 */
-	public $relation = dbRelation::EQUAL;	
-	
-	/**
-	 * Construcor
-	 * @param string $relation Query argument relation beetween field and value
-	 * @see \samson\activerecord\Argument:relation
-	 */
-	public function __construct( $field, $value, $relation = dbRelation::EQUAL )
-	{		
-		// Установим поле условия
-		$this->field = $field;
-		
-		// Установим значение поля условия
-		$this->value = $value;
-		
-		// Установим отношение
-		$this->relation = !isset($relation) ? dbRelation::EQUAL : $relation;	
-	}		
+
 }

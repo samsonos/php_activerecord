@@ -6,16 +6,7 @@ namespace samson\activerecord;
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
  *
  */
-class dbRelation
+class dbRelation extends \samsonframework\orm\Relation
 {
-	const EQUAL 		= '=';
-	const NOT_EQUAL 	= '!=';
-	const GREATER 		= '>';
-	const LOWER 		= '<';
-	const GREATER_EQ 	= '>=';
-	const LOWER_EQ 		= '<=';
-	const LIKE 			= ' LIKE ';
-	const NOTNULL 		= ' IS NOT NULL ';
-	const ISNULL 		= ' IS NULL ';
-	const OWN 			= ' !!! ';
+
 }

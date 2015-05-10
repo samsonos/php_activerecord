@@ -135,7 +135,7 @@ class dbMySQL extends dbMySQLConnector
         $sql = $this->prepareSQL($class_name, $query);
 
         // Выполним запрос к БД
-        $db_data = $this->query($sql);
+        $db_data = $this->fetch($sql);
 
         //trace($query->virtual_fields);
 
@@ -160,7 +160,7 @@ class dbMySQL extends dbMySQLConnector
         extract($this->__get_table_data($class_name));
 
         // Выполним запрос к БД
-        $record_data = $this->query('SELECT ' . $_sql_select['this'] . ' FROM ' . $_sql_from['this'] . ' WHERE ' . $_table_name . '.' . $_primary . ' = "' . $id . '"');
+        $record_data = $this->fetch('SELECT ' . $_sql_select['this'] . ' FROM ' . $_sql_from['this'] . ' WHERE ' . $_table_name . '.' . $_primary . ' = "' . $id . '"');
 
         // Если запрос выполнился успешно и получена минимум 1-на запись из БД - создадим объект-запись из неё
         $db_records = $this->toRecords($class_name, $record_data);
@@ -256,7 +256,7 @@ class dbMySQL extends dbMySQLConnector
             $this->prepareInnerSQL($className, $query, $params) .
             ') as __table';
 
-        $result = $this->query($sql);
+        $result = $this->fetch($sql);
 
         return $result[0]['__Count'];
     }
@@ -413,10 +413,10 @@ class dbMySQL extends dbMySQLConnector
      * "Правильно" разпознать переданный аргумент условия запроса к БД
      *
      * @param string $class_name Схема сущности БД для которой данные условия
-     * @param dbConditionArgument $arg Аругемнт условия для преобразования
+     * @param Argument $arg Аругемнт условия для преобразования
      * @return string Возвращает разпознанную строку с условием для MySQL
      */
-    protected function parseCondition($class_name, Argument & $arg)
+    protected function parseCondition($class_name, & $arg)
     {
         // Получим переменные для запроса
         extract($this->__get_table_data($class_name));

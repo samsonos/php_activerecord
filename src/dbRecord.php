@@ -9,7 +9,7 @@ use samsonframework\orm\Record;
  * @author Nikita Kotenko <nick.w2r@gmail.com>
  *
  */
-class dbRecord extends Record implements idbRecord
+class dbRecord extends Record
 {
 
 }

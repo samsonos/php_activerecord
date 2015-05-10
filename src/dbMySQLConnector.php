@@ -587,7 +587,7 @@ class dbMySQLConnector extends Database
         $db_mapper = array();
 
         // Получим информацию о всех таблицах из БД
-        $rows = $this->query(
+        $rows = $this->fetch(
             'SELECT
               `TABLES`.`TABLE_NAME` as `TABLE_NAME`,
               `COLUMNS`.`COLUMN_NAME` as `Field`,

@@ -458,7 +458,7 @@ class dbMySQL extends dbMySQLConnector
      * @param idbRecord $object Объект для которого формируется список полей
      * @param boolean $straight Флаг вывода массива вида: КЛЮЧ = ЗНАЧЕНИЕ
      */
-    protected function & getQueryFields($class_name, idbRecord & $object = null, $straight = false)
+    protected function & getQueryFields($class_name, & $object = null, $straight = false)
     {
         // Получим переменные для запроса
         extract($this->__get_table_data($class_name));

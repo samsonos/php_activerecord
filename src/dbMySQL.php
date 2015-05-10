@@ -228,7 +228,7 @@ class dbMySQL extends dbMySQLConnector
 
                 // If we found migration method from current db version
                 if ($from == $version) {
-                    elapsed('Databse migration from version: ' . $from . ' -> ' . $to);
+                    elapsed('Database migration from version: ' . $from . ' -> ' . $to);
 
                     // Run migration method
                     if (call_user_func(array($version_handler[0], $m)) !== false) {
@@ -714,16 +714,5 @@ class dbMySQL extends dbMySQLConnector
 
         // Вернем то что у нас вышло
         return $collection;
-    }
-
-    /**
-     * Get closes class to dbRecord in class ierarchy
-     * @param string $class_name Class for analyzing
-     * @return string Closes class to dbRecord
-     */
-    protected function getClassName($class_name)
-    {
-        return ($parentclass = get_parent_class($class_name)) == ns_classname('dbRecord',
-            'samson\activerecord') ? $class_name : $parentclass;
     }
 }

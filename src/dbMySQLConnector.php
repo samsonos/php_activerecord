@@ -395,8 +395,8 @@ class dbMySQLConnector extends Database
 			$class_eval .= $vars_eval;		
 			
 			// Заполним конструктор класса для установки схемы
-			$class_eval .= "\n\t".'/** Создать экземпляр класса '.$class_name.' */';
-			$class_eval .= "\n\t".'public function __construct( $id = NULL, $class_name = NULL ){ if( !isset($class_name)) $class_name = "'.$class_name.'" ; parent::__construct( $id, $class_name ); }';
+			//$class_eval .= "\n\t".'/** Создать экземпляр класса '.$class_name.' */';
+			//$class_eval .= "\n\t".'public function __construct( $id = NULL, $class_name = NULL ){ if( !isset($class_name)) $class_name = "'.$class_name.'" ; parent::__construct( $id, $class_name ); }';
 
 			// Геттер для получения переменных класса по другому названию
 			//$class_eval .= "\n\t".'/** Попытаться получить переменную класса '.$class_name.' */';

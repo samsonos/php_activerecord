@@ -602,6 +602,8 @@ class dbMySQLConnector extends Database
               WHERE `TABLES`.`TABLE_SCHEMA`="' . $this->database . '" AND `COLUMNS`.`TABLE_SCHEMA`="' . $this->database . '"'
         );
 
+
+
         foreach ($rows as $row) {
             // Получим имя таблицы
             $table_name = $row['TABLE_NAME'];

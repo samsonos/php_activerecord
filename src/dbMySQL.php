@@ -40,29 +40,30 @@ class dbMySQL extends dbMySQLConnector
     public function createField($object, $table, $field, $type = 'INT')
     {
         // Check if db identifier field is configured
-        if (strlen($object->$field)) {
+        if (class_exists($table, false)) {
+            if (strlen($object->$field)) {
+                // Variable to get all social table attributes
+                $attributes = array();
+                // Get table attributes - PHP 5.2 compatible
+                eval('$attributes = ' . $table . '::$_attributes;');
 
-            // Variable to get all social table attributes
-            $attributes = array();
-            // Get table attributes - PHP 5.2 compatible
-            eval('$attributes = ' . $table . '::$_attributes;');
+                // Remove namespaces
+                $table = classname($table);
 
-            // Remove namespaces
-            $table = classname($table);
+                // Make keys lowercase
+                $attributes = array_change_key_case_unicode($attributes);
 
-            // Make keys lowercase
-            $attributes = array_change_key_case_unicode($attributes);
+                // If table does not have defined identifier field
+                if (!isset($attributes[strtolower($object->$field)])) {
+                    // Add identifier field to social users table
+                    $this->simple_query('ALTER TABLE  `' . $table . '` ADD  `' . $object->$field . '` ' . $type . ' ');
+                }
 
-            // If table does not have defined identifier field
-            if (!isset($attributes[strtolower($object->$field)])) {
-                // Add identifier field to social users table
-                $this->simple_query('ALTER TABLE  `' . $table . '` ADD  `' . $object->$field . '` ' . $type . ' ');
+                return true;
+
+            } else { // Signal error
+                return e('Cannot load "' . get_class($object) . '" module - no $' . $field . ' is configured');
             }
-
-            return true;
-
-        } else { // Signal error
-            return e('Cannot load "' . get_class($object) . '" module - no $' . $field . ' is configured');
         }
     }
 

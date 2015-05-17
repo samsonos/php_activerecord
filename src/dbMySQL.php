@@ -151,7 +151,6 @@ class dbMySQL extends dbMySQLConnector
     }
 
 
-
     /**
      * @see idb::find_by_id()
      */
@@ -192,7 +191,7 @@ class dbMySQL extends dbMySQLConnector
         // Get current database version
         $version = call_user_func($version_handler);
 
-        // DB vesion migrating mechanism
+        // DB version migrating mechanism
         foreach (get_class_methods($classname) as $m) {
             // Parse migration method name to get migrating versions
             if (preg_match('/^migrate_(?<from>\d+)_to_(?<to>\d+)/i', $m, $matches)) {
@@ -201,8 +200,6 @@ class dbMySQL extends dbMySQLConnector
 
                 // If we found migration method from current db version
                 if ($from == $version) {
-                    elapsed('Database migration from version: ' . $from . ' -> ' . $to);
-
                     // Run migration method
                     if (call_user_func(array($version_handler[0], $m)) !== false) {
                         // Save current version for further migrating
@@ -210,6 +207,10 @@ class dbMySQL extends dbMySQLConnector
 
                         // Call database version changing handler
                         call_user_func($version_handler, $to);
+
+                        // Reload page
+                        header('Location: /');
+                        die('Database migration from version: ' . $from . ' -> ' . $to);
                     } // Break and error
                     else {
                         e('Database migration from ## -> ## - has Failed', E_SAMSON_ACTIVERECORD_ERROR,
@@ -453,7 +454,6 @@ class dbMySQL extends dbMySQLConnector
     }
 
 
-
     /**
      * Create object instance by specified parameters
      * @param string $className Object class name
@@ -468,7 +468,8 @@ class dbMySQL extends dbMySQLConnector
         array & $attributes,
         array & $dbData,
         array & $virtualFields = array()
-    ) {
+    )
+    {
         // If this object instance is not cached
         if (!isset(dbRecord::$instances[$className][$identifier]) || isset($dbData['__Count']) || sizeof($virtualFields)) {
 

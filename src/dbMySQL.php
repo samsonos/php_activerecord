@@ -209,8 +209,7 @@ class dbMySQL extends dbMySQLConnector
                         call_user_func($version_handler, $to);
 
                         // Reload page
-                        header('Location: /');
-                        die('Database migration from version: ' . $from . ' -> ' . $to);
+                        elapsed('Database migration from version: ' . $from . ' -> ' . $to);
                     } // Break and error
                     else {
                         e('Database migration from ## -> ## - has Failed', E_SAMSON_ACTIVERECORD_ERROR,

@@ -1,5 +1,6 @@
 <?php
 namespace samson\activerecord;
+use samsonframework\orm\Relation;
 
 /**
  * Класс описывающий работу с MySQL
@@ -442,11 +443,18 @@ class dbMySQL extends dbMySQLConnector
         } // Если аргумент условия - это массив и в нем есть значения
         else {
             if (sizeof($arg->value)) {
+                // TODO: Add other numeric types support
+
+                // Generate list of values, integer type optimization
+                $sql_values = $class_name::$_types[$arg->field] == 'int'
+                    ? ' IN (' . implode(',', $arg->value) . ')'
+                    : ' IN ("' . implode('","', $arg->value) . '")';
+
                 switch ($arg->relation) {
-                    case dbRelation::EQUAL:
-                        return $sql_cond_t . ' IN ("' . implode('","', $arg->value) . '")';
-                    case dbRelation::NOT_EQUAL:
-                        return $sql_cond_t . ' NOT IN ("' . implode('","', $arg->value) . '")';
+                    case Relation::EQUAL:
+                        return $sql_cond_t . $sql_values;
+                    case Relation::NOT_EQUAL:
+                        return $sql_cond_t . ' NOT ' . $sql_values;
                 }
             }
         }

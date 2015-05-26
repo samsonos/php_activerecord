@@ -444,9 +444,10 @@ class dbMySQL extends dbMySQLConnector
         else {
             if (sizeof($arg->value)) {
                 // TODO: Add other numeric types support
+                // TODO: Get types of joined tables fields
 
                 // Generate list of values, integer type optimization
-                $sql_values = $class_name::$_types[$arg->field] == 'int'
+                $sql_values = isset($class_name::$_types[$arg->field]) && $class_name::$_types[$arg->field] == 'int'
                     ? ' IN (' . implode(',', $arg->value) . ')'
                     : ' IN ("' . implode('","', $arg->value) . '")';
 

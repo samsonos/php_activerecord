@@ -16,7 +16,7 @@ class dbQuery extends \samsonframework\orm\Query
     /**
      * Указатель на текущую группу условий с которой работает запрос
      *
-     * @var dbConditionGroup
+     * @var Condition
      */
     public $cConditionGroup;
 
@@ -29,7 +29,7 @@ class dbQuery extends \samsonframework\orm\Query
     /**
      * Указатель на группу условий для текущего объекта с которой работает запрос
      *
-     * @var dbConditionGroup
+     * @var Condition
      */
     public $own_condition;
 
@@ -356,16 +356,14 @@ class dbQuery extends \samsonframework\orm\Query
                 $this->empty = true;
                 return $this;
             }
-            // Создадим аргумент условия
-            $attribute = new Argument($attribute, $value, $relation);
 
             // Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
-            if (property_exists($this->class_name, $attribute->field)) {
+            if (property_exists($this->class_name, $attribute)) {
                 $destination = &$this->own_condition;
             }
 
             // Добавим аргумент условия в выбранную группу условий
-            $destination->arguments[] = $attribute;
+            $destination->add($attribute, $value, $relation);
             // If condition group is passed
         } elseif (is_a($attribute, ns_classname('Condition', 'samson\activerecord'))) {
             // Iterate condition arguments

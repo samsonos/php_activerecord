@@ -354,6 +354,23 @@ class dbQuery extends \samsonframework\orm\Query
     }
 
     /**
+     * Add condition by primary field
+     *
+     * @param string $value Primary field value
+     * @return self Chaining
+     * @deprecated Use direct query with where('PRIMARY_FIELD',...)
+     */
+    public function id($value)
+    {
+        // PHP 5.2 get primary field
+        $_primary = null;
+        eval('$_primary = ' . $this->class_name . '::$_primary;');
+
+        // Set primary field value
+        return $this->where($_primary, $value);
+    }
+
+    /**
      * Add condition to current query.
      * This method supports receives three possible types for $fieldName,
      * this is deprecated logic and this should be changed to use separate methods

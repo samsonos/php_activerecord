@@ -360,8 +360,14 @@ class dbQuery extends \samsonframework\orm\Query
      */
     public function __construct($entity = null)
     {
-        $this->className($entity);
-        $this->flush();
+        // Old support for not full class names
+        if (strpos($entity, '\\') === false) {
+            // Add generic namespace
+            $entity = '\samson\activerecord\\'.$entity;
+        }
+
+        // Call parent constructor
+        parent::__construct($entity, db());
     }
 
     // Magic method after-clonning

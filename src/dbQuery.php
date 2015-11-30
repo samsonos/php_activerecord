@@ -350,7 +350,7 @@ class dbQuery extends \samsonframework\orm\Query
             $className = '\samson\activerecord\\'.$className;
         }
 
-        return func_num_args() > 0 ? $this->entity($className) : $this->entity();
+        return func_num_args() > 0 ? $this->entity($className) : $this->class_name;
     }
 
     /**

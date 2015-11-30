@@ -415,43 +415,4 @@ class dbQuery extends \samsonframework\orm\Query
         // Call parent constructor
         parent::__construct($entity, db());
     }
-
-    // Magic method after-clonning
-    public function __clone()
-    {
-        // Remove old references
-        $condition = $this->condition;
-        unset($this->condition);
-
-        // Set new one on copied values
-        $this->condition = $condition;
-        $this->cConditionGroup = &$this->condition;
-    }
-
-    // Магический метод для выполнения не описанных динамических методов класса
-    public function __call($methodName, array $arguments)
-    {
-        /** @var array $matches Prepared statement matches */
-        $matches = array();
-        // Если этот метод поддерживается - выполним запрос к БД
-        if (preg_match('/^(find_by|find_all_by|all)/iu', $methodName, $matches)) {
-            return db()->find($this->class_name, $this->parse($methodName, $arguments));
-        } elseif (property_exists($this->class_name, $methodName)) { // Проверим существует ли у класса заданное поле
-
-            // Если передан аргумент - расцениваем его как аргумент запроса
-            if (sizeof($arguments) > 1) {
-                return $this->cond($methodName, $arguments[0], $arguments[1]);
-            } elseif (isset($arguments[0])) {
-                return $this->cond($methodName, $arguments[0]);
-            } else { // Просто игнорируем условие
-                return $this;
-            }
-        } else { // Сообщим об ошибке разпознования метода
-            return e(
-                'Не возможно определить метод(##) для создания запроса к БД',
-                E_SAMSON_ACTIVERECORD_ERROR,
-                $methodName
-            );
-        }
-    }
 }

@@ -479,7 +479,24 @@ class dbQuery extends \samsonframework\orm\Query
      */
     public function className($className = null)
     {
+        // Old support for not full class names
+        if (strpos($className, '\\') === false) {
+            // Add generic namespace
+            $className = '\samson\activerecord\\'.$className;
+        }
+
         return func_num_args() > 0 ? $this->entity($className) : $this->entity();
+    }
+
+    /**
+     * Query constructor.
+     * @param string|null $entity Entity identifier
+     * @throws EntityNotFound
+     */
+    public function __construct($entity = null)
+    {
+        $this->className($entity);
+        $this->flush();
     }
 
     // Magic method after-clonning

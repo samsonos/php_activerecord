@@ -124,7 +124,7 @@ class dbMySQL extends dbMySQLConnector
     /**
      * @see idb::find()
      */
-    public function & find($class_name, dbQuery $query)
+    public function &find($class_name, dbQuery $query)
     {
         // Результат выполнения запроса
         $result = array();
@@ -155,7 +155,7 @@ class dbMySQL extends dbMySQLConnector
     /**
      * @see idb::find_by_id()
      */
-    public function & find_by_id($class_name, $id)
+    public function &find_by_id($class_name, $id)
     {
         // Получим переменные для запроса
         extract($this->__get_table_data($class_name));
@@ -470,7 +470,7 @@ class dbMySQL extends dbMySQLConnector
      *
      * @return idbRecord Database record object instance
      */
-    public function & createObject(
+    public function &createObject(
         $className,
         $identifier,
         array & $attributes,
@@ -520,7 +520,7 @@ class dbMySQL extends dbMySQLConnector
      * @return array Коллекцию записей БД во внутреннем формате
      * @see dbRecord
      */
-    protected function & toRecords($class_name, array & $response, array $join = array(), array $virtual_fields = array())
+    protected function &toRecords($class_name, array & $response, array $join = array(), array $virtual_fields = array())
     {
         // Сформируем правильное имя класса
         $class_name = ns_classname($class_name, 'samson\activerecord');

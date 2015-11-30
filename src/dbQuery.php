@@ -354,6 +354,35 @@ class dbQuery extends \samsonframework\orm\Query
     }
 
     /**
+     * Add condition to current query.
+     * This method supports receives three possible types for $fieldName,
+     * this is deprecated logic and this should be changed to use separate methods
+     * for each argument type.
+     *
+     * @param string|ConditionInterface|ArgumentInterface $fieldName Entity field name
+     * @param string $fieldValue Value
+     * @param string $relation Relation between field name and its value
+     * @deprecated @see self::where()
+     * @return self Chaining
+     */
+    public function cond($fieldName, $fieldValue = null, $relation = '=')
+    {
+        // If empty array is passed
+        if (is_string($fieldName)) {
+            return $this->where($fieldName, $fieldValue, $relation);
+        } elseif (is_array($fieldValue) && !sizeof($fieldValue)) {
+            $this->empty = true;
+            return $this;
+        } elseif (is_a($fieldName, __NAMESPACE__.'\ConditionInterface')) {
+            $this->whereCondition($fieldName);
+        } elseif (is_a($fieldName, __NAMESPACE__.'\ArgumentInterface')) {
+            $this->getConditionGroup($fieldName->field)->addArgument($fieldName);
+        }
+
+        return $this;
+    }
+
+    /**
      * Query constructor.
      * @param string|null $entity Entity identifier
      * @throws EntityNotFound

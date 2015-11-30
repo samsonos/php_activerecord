@@ -6,7 +6,7 @@ namespace samson\activerecord;
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
  * @deprecated use \samsonframework\orm\Relation
  */
-class dbRelation extends \samsonframework\orm\Relation
+class dbRelation implements \samsonframework\orm\ArgumentInterface
 {
 
 }

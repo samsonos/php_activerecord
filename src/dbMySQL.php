@@ -452,9 +452,9 @@ class dbMySQL extends dbMySQLConnector
                     : ' IN ("' . implode('","', $arg->value) . '")';
 
                 switch ($arg->relation) {
-                    case Relation::EQUAL:
+                    case dbRelation::EQUAL:
                         return $sql_cond_t . $sql_values;
-                    case Relation::NOT_EQUAL:
+                    case dbRelation::NOT_EQUAL:
                         return $sql_cond_t . ' NOT ' . $sql_values;
                 }
             }

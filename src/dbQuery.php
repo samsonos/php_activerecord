@@ -319,26 +319,7 @@ class dbQuery extends \samsonframework\orm\Query
         return $this->cond($attribute, $value, dbRelation::LIKE);
     }
 
-    /**
-     * Add condition by primary field
-     *
-     * @param string $value Primary field value
-     * @return \samson\activerecord\dbQuery Chaining
-     */
-    public function id($value)
-    {
-        // PHP 5.2 get primary field
-        eval('$_primary = ' . $this->class_name . '::$_primary;');
 
-        // Set primary field value
-        return $this->cond($_primary, $value);
-    }
-
-    /**	 @see idbQuery::where() */
-    public function where($condition)
-    {
-        return $this->cond($condition, '', dbRelation::OWN);
-    }
 
     /** @deprecated Use self::fields() */
     public function fieldsNew($fieldName, & $return = null)
@@ -492,24 +473,13 @@ class dbQuery extends \samsonframework\orm\Query
      * Function to reconfigure dbQuery to work with multiple Entities
      *
      * @param string $className Entity name
+     * @deprecated @see \samsonframework\orm\QueryInterface::entity(), full class name with namespace
+     *                 should be passed.
      * @return self|string Chaining or current class name if nothing is passed
      */
     public function className($className = null)
     {
-        if (!func_num_args()) {
-            return $this->class_name;
-        } else {
-            $this->flush();
-
-            if (isset($className)) {
-                // Сформируем правильное имя класса
-                $className = ns_classname($className, 'samson\activerecord');
-                // Установим имя класса для запроса
-                $this->class_name = $className;
-            }
-
-            return $this;
-        }
+        return func_num_args() > 0 ? $this->entity($className) : $this->entity();
     }
 
     // Magic method after-clonning
@@ -549,30 +519,5 @@ class dbQuery extends \samsonframework\orm\Query
                 $methodName
             );
         }
-    }
-
-    /**
-     * Конструктор
-     * @param string|null 	$className  Имя класса для которого создается запрос к БД
-     * @param mixed		    $link		Указатель на экземпляр подключения к БД
-     */
-    public function __construct($className = null, & $link = null)
-    {
-        /*
-        // Проверим класс
-        if( !class_exists( $class_name ) )
-        {
-            e(
-                'Не возможно создать запрос БД для класса(##) - Класс не существует',
-                E_SAMSON_ACTIVERECORD_ERROR,
-                $class_name
-            );
-        }
-        */
-
-        $this->className($className);
-
-        // Сохраним экземпляр соединения
-        $this->link = $link;
     }
 }

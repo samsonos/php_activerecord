@@ -364,7 +364,7 @@ class dbMySQL extends dbMySQLConnector
         $from .= "\n" . ' FROM ' . $params['_sql_from']['this'];
 
         // Если существуют условия для главной таблицы в запросе - получим их
-        if (sizeof($query->own_condition->arguments)) {
+        if ($query->own_condition->size()) {
             $from .= "\n" . ' WHERE (' . $this->getConditions($query->own_condition, $class_name) . ')';
         }
 
@@ -392,7 +392,7 @@ class dbMySQL extends dbMySQLConnector
         $sql_condition = array();
 
         // Переберем все аргументы условий в условной группе условия
-        foreach ($cond_group->arguments as $argument) {
+        foreach ($cond_group as $argument) {
             // Если аргумент я вляется группой аргументов, разпарсим его дополнительно
             if (is_a($argument, ns_classname('Condition', 'samson\activerecord'))) {
                 $sql_condition[] = $this->getConditions($argument, $class_name);

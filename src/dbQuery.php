@@ -340,54 +340,6 @@ class dbQuery extends \samsonframework\orm\Query
         return $this->cond($condition, '', dbRelation::OWN);
     }
 
-    /**	 @see idbQuery::cond() */
-    public function cond($attribute, $value = null, $relation = dbRelation::EQUAL)
-    {
-        // Установим общую группу условий
-        $destination = &$this->cConditionGroup;
-
-        // Если передана строка как атрибут
-        if (is_string($attribute)) {
-            // If value is not set or an empty array
-            if (!isset($value)) {
-                $relation = dbRelation::ISNULL;
-                $value = '';
-            } elseif (is_array($value) && !sizeof($value)) {
-                $this->empty = true;
-                return $this;
-            }
-
-            // Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
-            if (property_exists($this->class_name, $attribute)) {
-                $destination = &$this->own_condition;
-            }
-
-            // Добавим аргумент условия в выбранную группу условий
-            $destination->add($attribute, $value, $relation);
-            // If condition group is passed
-        } elseif (is_a($attribute, ns_classname('Condition', 'samson\activerecord'))) {
-            // Iterate condition arguments
-            foreach ($attribute->arguments as $arg) {
-                // Default destination condition group
-                $destination = &$this->cConditionGroup;
-
-                // TODO: add recursion as argument can be an condition group
-                if (is_a($arg, ns_classname('Argument', 'samson\activerecord'))) {
-                    // If base query table has this attribute - use base table condition collection
-                    if (property_exists($this->class_name, $arg->field)) {
-                        $destination = &$this->own_condition;
-                    }
-                }
-
-                // Add condition argument to defined destination
-                $destination->arguments[] = $attribute;
-            }
-        }
-
-        // Вернем себя для цепирования
-        return $this;
-    }
-
     /** @deprecated Use self::fields() */
     public function fieldsNew($fieldName, & $return = null)
     {

@@ -1,6 +1,5 @@
 <?php
 namespace samson\activerecord;
-use samsonframework\orm\Relation;
 
 /**
  * Класс описывающий работу с MySQL

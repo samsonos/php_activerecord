@@ -142,7 +142,7 @@ class dbMySQL extends dbMySQLConnector
                 $fields) . ' WHERE ' . $className::$_table_name . '.' . $className::$_primary . '="' . $object->id . '"';
         $this->query($sql);
     }
-    etur
+
     public function delete($className, &$object)
     {
         // Build SQL query

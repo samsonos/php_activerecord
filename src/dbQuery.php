@@ -390,9 +390,9 @@ class dbQuery extends \samsonframework\orm\Query
         } elseif (is_array($fieldValue) && !sizeof($fieldValue)) {
             $this->empty = true;
             return $this;
-        } elseif (is_a($fieldName, __NAMESPACE__.'\ConditionInterface')) {
+        } elseif (is_a($fieldName, '\samsonframework\orm\ConditionInterface')) {
             $this->whereCondition($fieldName);
-        } elseif (is_a($fieldName, __NAMESPACE__.'\ArgumentInterface')) {
+        } elseif (is_a($fieldName, '\samsonframework\orm\ArgumentInterface')) {
             $this->getConditionGroup($fieldName->field)->addArgument($fieldName);
         }
 

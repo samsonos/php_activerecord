@@ -404,7 +404,7 @@ class dbQuery extends \samsonframework\orm\Query
      * @param string|null $entity Entity identifier
      * @throws EntityNotFound
      */
-    public function __construct($entity = null)
+    public function __construct($entity = 'material')
     {
         // Old support for not full class names
         if (strpos($entity, '\\') === false) {

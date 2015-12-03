@@ -1,6 +1,5 @@
 <?php
 namespace samson\activerecord;
-use samsonframework\orm\Relation;
 
 /**
  * Класс описывающий работу с MySQL
@@ -121,10 +120,40 @@ class dbMySQL extends dbMySQLConnector
         );
     }
 
+    public function create($className, &$object = null)
+    {
+        // ??
+        $fields = $this->getQueryFields($className, $object);
+        // Build SQL query
+        $sql = 'INSERT INTO `' . $className::$_table_name . '` (`'
+            . implode('`,`', array_keys($fields)) . '`)
+            VALUES (' . implode(',', $fields) . ')';
+        $this->query($sql);
+        // Return last inserted row identifier
+        return $this->driver->lastInsertId();
+    }
+
+    public function update($className, &$object)
+    {
+        // ??
+        $fields = $this->getQueryFields($className, $object, true);
+        // Build SQL query
+        $sql = 'UPDATE `' . $className::$_table_name . '` SET ' . implode(',',
+                $fields) . ' WHERE ' . $className::$_table_name . '.' . $className::$_primary . '="' . $object->id . '"';
+        $this->query($sql);
+    }
+
+    public function delete($className, &$object)
+    {
+        // Build SQL query
+        $sql = 'DELETE FROM `' . $className::$_table_name . '` WHERE ' . $className::$_primary . ' = "' . $object->id . '"';
+        $this->query($sql);
+    }
+
     /**
      * @see idb::find()
      */
-    public function & find($class_name, dbQuery $query)
+    public function &find($class_name, dbQuery $query)
     {
         // Результат выполнения запроса
         $result = array();
@@ -155,7 +184,7 @@ class dbMySQL extends dbMySQLConnector
     /**
      * @see idb::find_by_id()
      */
-    public function & find_by_id($class_name, $id)
+    public function &find_by_id($class_name, $id)
     {
         // Получим переменные для запроса
         extract($this->__get_table_data($class_name));
@@ -176,6 +205,82 @@ class dbMySQL extends dbMySQLConnector
 
         // Вернем переменную
         return $ret;
+    }
+
+    /**
+     * Выполнить защиту значения поля для его безопасного использования в запросах
+     *
+     * @param string $value Значения поля для запроса
+     * @return string $value Безопасное представление значения поля для запроса
+     */
+    protected function protectQueryValue($value)
+    {
+        // If magic quotes are on - remove slashes
+        if (get_magic_quotes_gpc()) {
+            $value = stripslashes($value);
+        }
+
+        // Normally escape string
+        $value = $this->driver->quote($value);
+
+        // Return value in quotes
+        return $value;
+    }
+
+    /** @deprecated Use execute() */
+    public function &simple_query($sql)
+    {
+        return $this->query($sql);
+    }
+
+    /** Count query result */
+    public function count($className, $query)
+    {
+        // Get SQL
+        $sql = 'SELECT Count(*) as __Count FROM (' . $this->prepareSQL($className, $query) . ') as __table';
+
+        // Выполним запрос к БД
+        $result = $this->fetch($sql);
+
+        return $result[0]['__Count'];
+    }
+
+    /**
+     * Prepare create & update SQL statements fields
+     * @param string $className Entity name
+     * @param Record $object Database object to get values(if needed)
+     * @param bool $straight Way of forming SQL field statements
+     * @return array Collection of key => value with SQL fields statements
+     */
+    protected function &getQueryFields($className, & $object = null, $straight = false)
+    {
+        // Результирующая коллекция
+        $collection = array();
+
+        // Установим флаг получения значений атрибутов из переданного объекта
+        $use_values = isset($object);
+
+        // Переберем "настоящее" имена атрибутов схемы данных для объекта
+        foreach ($className::$_table_attributes as $attribute => $map_attribute) {
+            // Отметки времени не заполняем
+            if ($className::$_types[$attribute] == 'timestamp') {
+                continue;
+            }
+
+            // Основной ключ не заполняем
+            if ($className::$_primary == $attribute) {
+                continue;
+            }
+
+            // Получим значение атрибута объекта защитив от инъекций, если объект передан
+            $value = $use_values ? $this->driver->quote($object->$map_attribute) : '';
+
+            // Добавим значение поля, в зависимости от вида вывывода метода
+            $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
+        }
+
+        // Вернем полученную коллекцию
+        return $collection;
     }
 
     /**
@@ -364,7 +469,7 @@ class dbMySQL extends dbMySQLConnector
         $from .= "\n" . ' FROM ' . $params['_sql_from']['this'];
 
         // Если существуют условия для главной таблицы в запросе - получим их
-        if (sizeof($query->own_condition->arguments)) {
+        if ($query->own_condition->size()) {
             $from .= "\n" . ' WHERE (' . $this->getConditions($query->own_condition, $class_name) . ')';
         }
 
@@ -392,7 +497,7 @@ class dbMySQL extends dbMySQLConnector
         $sql_condition = array();
 
         // Переберем все аргументы условий в условной группе условия
-        foreach ($cond_group->arguments as $argument) {
+        foreach ($cond_group as $argument) {
             // Если аргумент я вляется группой аргументов, разпарсим его дополнительно
             if (is_a($argument, ns_classname('Condition', 'samson\activerecord'))) {
                 $sql_condition[] = $this->getConditions($argument, $class_name);
@@ -452,9 +557,9 @@ class dbMySQL extends dbMySQLConnector
                     : ' IN ("' . implode('","', $arg->value) . '")';
 
                 switch ($arg->relation) {
-                    case Relation::EQUAL:
+                    case dbRelation::EQUAL:
                         return $sql_cond_t . $sql_values;
-                    case Relation::NOT_EQUAL:
+                    case dbRelation::NOT_EQUAL:
                         return $sql_cond_t . ' NOT ' . $sql_values;
                 }
             }
@@ -470,7 +575,7 @@ class dbMySQL extends dbMySQLConnector
      *
      * @return idbRecord Database record object instance
      */
-    public function & createObject(
+    public function &createObject(
         $className,
         $identifier,
         array & $attributes,
@@ -520,7 +625,7 @@ class dbMySQL extends dbMySQLConnector
      * @return array Коллекцию записей БД во внутреннем формате
      * @see dbRecord
      */
-    protected function & toRecords($class_name, array & $response, array $join = array(), array $virtual_fields = array())
+    protected function &toRecords($class_name, array & $response, array $join = array(), array $virtual_fields = array())
     {
         // Сформируем правильное имя класса
         $class_name = ns_classname($class_name, 'samson\activerecord');

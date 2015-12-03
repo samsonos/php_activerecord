@@ -16,7 +16,7 @@ class dbQuery extends \samsonframework\orm\Query
     /**
      * Указатель на текущую группу условий с которой работает запрос
      *
-     * @var dbConditionGroup
+     * @var Condition
      */
     public $cConditionGroup;
 
@@ -29,7 +29,7 @@ class dbQuery extends \samsonframework\orm\Query
     /**
      * Указатель на группу условий для текущего объекта с которой работает запрос
      *
-     * @var dbConditionGroup
+     * @var Condition
      */
     public $own_condition;
 
@@ -83,141 +83,6 @@ class dbQuery extends \samsonframework\orm\Query
      */
     public $join = array();
 
-
-
-    /** Query handlers stack */
-    protected $stack = array();
-
-    /** Query parameters stack */
-    protected $params = array();
-
-// 	/**
-// 	 * Universal handler to pass to CMSMaterial::get()	 *
-// 	 * @param samson\activerecord\dbQuery $db_query Original db query object for modifiyng
-// 	 *
-// 	 */
-// 	protected function __handler()
-// 	{
-// 		// Iterate handlers and run them
-// 		foreach ( $this->stack as $i => $handler )
-// 		{
-// 			// Create handler params array with first parameter pointing to this query object			
-// 			$params = array( &$this );		
-
-// 			// Combine params with existing ones in one array
-// 			$params = array_merge( $params, $this->params[ $i ] ); 			
-
-// 			// Append this query object as first handler parameter
-// 			//array_unshift( $this->params[ $i ] , & $this );			
-
-// 			//trace($this->params[ $i ]);
-// 			call_user_func_array( $handler, $params );
-// 		}
-// 	}
-
-// 	/**
-// 	 * Add query handler
-// 	 * @param callable $callable External handler
-// 	 * @return samson\activerecord\dbQuery
-// 	 */
-// 	public function handler( $callable )
-// 	{
-// 		// If normal handler is passed
-// 		if( is_callable( $callable ) )
-// 		{
-// 			// Add handler
-// 			$this->stack[] = $callable;
-
-// 			// Get passed arguments
-// 			$args = func_get_args();
-
-// 			// Remove first argument
-// 			array_shift( $args );
-
-// 			// Add handler parameters stack
-// 			$this->params[] = & $args;
-// 		}
-// 		else e('Cannot set CMS Query handler - function(##) does not exists', E_SAMSON_CMS_ERROR, $callable );
-
-// 		return $this;
-// 	}
-
-    // 	/** @see idbQuery::fields() */
-    // 	public function fields( $field_name, & $return_value = null )
-    // 	{
-    // 		// Call handlers stack
-    // 		$this->_callHandlers();
-
-    // 		// Iterate records and gather specified field
-    // 		$return_value = array();
-    // 		foreach ( db()->find( $this->class_name, $this ) as $record ) $return_value[] =  $record->$field_name;
-
-    // 		// Clear this query
-    // 		$this->flush();
-
-    // 		// Method return value
-    // 		$return = null;
-
-    // 		// If return value is passed - return boolean about request results
-    // 		if( func_num_args() > 1 ) $return = (is_array( $return_value ) && sizeof( $return_value ));
-    // 		// Set request results as return value
-    // 		else $return = & $return_value;
-
-    // 		// Otherwise just return request results
-    // 		return $return;
-    // 	}
-
-    // 	/** @see idbQuery::get() */
-    // 	public function & exec( & $return_value = null)
-    // 	{
-    // 		// Call handlers stack
-    // 		$this->_callHandlers();
-
-    // 		// Perform DB request
-    // 		$return_value = db()->find( $this->class_name, $this );
-
-    // 		// Clear this query
-    // 		$this->flush();
-
-    // 		// Method return value
-    // 		$return = null;
-
-    // 		// If return value is passed - return boolean about request results
-    // 		if( func_num_args() ) $return = (is_array( $return_value ) && sizeof( $return_value ));
-    // 		// Set request results as return value
-    // 		else $return = & $return_value;
-
-    // 		// Otherwise just return request results
-    // 		return $return;
-    // 	}
-
-    // 	/** @see idbQuery::first() */
-    // 	public function & first( & $return_value = null)
-    // 	{
-    // 		// Call handlers stack
-    // 		$this->_callHandlers();
-
-    // 		// Выполним запрос к БД
-    // 		$return_value = db()->find( $this->class_name, $this );
-
-    // 		// Получим первую запись из полученного массива, если она есть
-    // 		$return_value = isset( $return_value[0] ) ? $return_value[0] : null;
-
-    // 		// Очистим запрос
-    // 		$this->flush();
-
-    // 		// Локальная переменная для возврата правильного результата
-    // 		$return = null;
-
-    // 		// Если хоть что-то передано в функцию - запишем в локальную переменную boolean значение
-    // 		// которое покажет результат выполнения запроса к БД
-    // 		if( func_num_args() ) $return = isset( $return_value );
-    // 		// Сделаем копию полученных данных в локальную переменную
-    // 		else $return = & $return_value;
-
-    // 		// Вернем значение из локальной переменной
-    // 		return $return;
-    // 	}
 
     /** */
     public function own_limit($st, $en = NULL)
@@ -319,76 +184,7 @@ class dbQuery extends \samsonframework\orm\Query
         return $this->cond($attribute, $value, dbRelation::LIKE);
     }
 
-    /**
-     * Add condition by primary field
-     *
-     * @param string $value Primary field value
-     * @return \samson\activerecord\dbQuery Chaining
-     */
-    public function id($value)
-    {
-        // PHP 5.2 get primary field
-        eval('$_primary = ' . $this->class_name . '::$_primary;');
 
-        // Set primary field value
-        return $this->cond($_primary, $value);
-    }
-
-    /**	 @see idbQuery::where() */
-    public function where($condition)
-    {
-        return $this->cond($condition, '', dbRelation::OWN);
-    }
-
-    /**	 @see idbQuery::cond() */
-    public function cond($attribute, $value = null, $relation = dbRelation::EQUAL)
-    {
-        // Установим общую группу условий
-        $destination = &$this->cConditionGroup;
-
-        // Если передана строка как атрибут
-        if (is_string($attribute)) {
-            // If value is not set or an empty array
-            if (!isset($value)) {
-                $relation = dbRelation::ISNULL;
-                $value = '';
-            } elseif (is_array($value) && !sizeof($value)) {
-                $this->empty = true;
-                return $this;
-            }
-            // Создадим аргумент условия
-            $attribute = new Argument($attribute, $value, $relation);
-
-            // Если это свойство принадлежит главному классу запроса - установим внутреннюю группу условий
-            if (property_exists($this->class_name, $attribute->field)) {
-                $destination = &$this->own_condition;
-            }
-
-            // Добавим аргумент условия в выбранную группу условий
-            $destination->arguments[] = $attribute;
-            // If condition group is passed
-        } elseif (is_a($attribute, ns_classname('Condition', 'samson\activerecord'))) {
-            // Iterate condition arguments
-            foreach ($attribute->arguments as $arg) {
-                // Default destination condition group
-                $destination = &$this->cConditionGroup;
-
-                // TODO: add recursion as argument can be an condition group
-                if (is_a($arg, ns_classname('Argument', 'samson\activerecord'))) {
-                    // If base query table has this attribute - use base table condition collection
-                    if (property_exists($this->class_name, $arg->field)) {
-                        $destination = &$this->own_condition;
-                    }
-                }
-
-                // Add condition argument to defined destination
-                $destination->arguments[] = $attribute;
-            }
-        }
-
-        // Вернем себя для цепирования
-        return $this;
-    }
 
     /** @deprecated Use self::fields() */
     public function fieldsNew($fieldName, & $return = null)
@@ -542,87 +338,81 @@ class dbQuery extends \samsonframework\orm\Query
      * Function to reconfigure dbQuery to work with multiple Entities
      *
      * @param string $className Entity name
+     * @deprecated @see \samsonframework\orm\QueryInterface::entity(), full class name with namespace
+     *                 should be passed.
      * @return self|string Chaining or current class name if nothing is passed
      */
     public function className($className = null)
     {
-        if (!func_num_args()) {
-            return $this->class_name;
-        } else {
-            $this->flush();
-
-            if (isset($className)) {
-                // Сформируем правильное имя класса
-                $className = ns_classname($className, 'samson\activerecord');
-                // Установим имя класса для запроса
-                $this->class_name = $className;
-            }
-
-            return $this;
+        // Old support for not full class names
+        if (strpos($className, '\\') === false) {
+            // Add generic namespace
+            $className = '\samson\activerecord\\'.$className;
         }
-    }
 
-    // Magic method after-clonning
-    public function __clone()
-    {
-        // Remove old references
-        $condition = $this->condition;
-        unset($this->condition);
-
-        // Set new one on copied values
-        $this->condition = $condition;
-        $this->cConditionGroup = &$this->condition;
-    }
-
-    // Магический метод для выполнения не описанных динамических методов класса
-    public function __call($methodName, array $arguments)
-    {
-        /** @var array $matches Prepared statement matches */
-        $matches = array();
-        // Если этот метод поддерживается - выполним запрос к БД
-        if (preg_match('/^(find_by|find_all_by|all)/iu', $methodName, $matches)) {
-            return db()->find($this->class_name, $this->parse($methodName, $arguments));
-        } elseif (property_exists($this->class_name, $methodName)) { // Проверим существует ли у класса заданное поле
-
-            // Если передан аргумент - расцениваем его как аргумент запроса
-            if (sizeof($arguments) > 1) {
-                return $this->cond($methodName, $arguments[0], $arguments[1]);
-            } elseif (isset($arguments[0])) {
-                return $this->cond($methodName, $arguments[0]);
-            } else { // Просто игнорируем условие
-                return $this;
-            }
-        } else { // Сообщим об ошибке разпознования метода
-            return e(
-                'Не возможно определить метод(##) для создания запроса к БД',
-                E_SAMSON_ACTIVERECORD_ERROR,
-                $methodName
-            );
-        }
+        return func_num_args() > 0 ? $this->entity($className) : $this->class_name;
     }
 
     /**
-     * Конструктор
-     * @param string|null 	$className  Имя класса для которого создается запрос к БД
-     * @param mixed		    $link		Указатель на экземпляр подключения к БД
+     * Add condition by primary field
+     *
+     * @param string $value Primary field value
+     * @return self Chaining
+     * @deprecated Use direct query with where('PRIMARY_FIELD',...)
      */
-    public function __construct($className = null, & $link = null)
+    public function id($value)
     {
-        /*
-        // Проверим класс
-        if( !class_exists( $class_name ) )
-        {
-            e(
-                'Не возможно создать запрос БД для класса(##) - Класс не существует',
-                E_SAMSON_ACTIVERECORD_ERROR,
-                $class_name
-            );
+        // PHP 5.2 get primary field
+        $_primary = null;
+        eval('$_primary = ' . $this->class_name . '::$_primary;');
+
+        // Set primary field value
+        return $this->where($_primary, $value);
+    }
+
+    /**
+     * Add condition to current query.
+     * This method supports receives three possible types for $fieldName,
+     * this is deprecated logic and this should be changed to use separate methods
+     * for each argument type.
+     *
+     * @param string|ConditionInterface|ArgumentInterface $fieldName Entity field name
+     * @param string $fieldValue Value
+     * @param string $relation Relation between field name and its value
+     * @deprecated @see self::where()
+     * @return self Chaining
+     */
+    public function cond($fieldName, $fieldValue = null, $relation = '=')
+    {
+        // If empty array is passed
+        if (is_string($fieldName)) {
+            return $this->where($fieldName, $fieldValue, $relation);
+        } elseif (is_array($fieldValue) && !sizeof($fieldValue)) {
+            $this->empty = true;
+            return $this;
+        } elseif (is_a($fieldName, '\samsonframework\orm\ConditionInterface')) {
+            $this->whereCondition($fieldName);
+        } elseif (is_a($fieldName, '\samsonframework\orm\ArgumentInterface')) {
+            $this->getConditionGroup($fieldName->field)->addArgument($fieldName);
         }
-        */
 
-        $this->className($className);
+        return $this;
+    }
 
-        // Сохраним экземпляр соединения
-        $this->link = $link;
+    /**
+     * Query constructor.
+     * @param string|null $entity Entity identifier
+     * @throws EntityNotFound
+     */
+    public function __construct($entity = null)
+    {
+        // Old support for not full class names
+        if (strpos($entity, '\\') === false) {
+            // Add generic namespace
+            $entity = '\samson\activerecord\\'.$entity;
+        }
+
+        // Call parent constructor
+        parent::__construct($entity, db());
     }
 }

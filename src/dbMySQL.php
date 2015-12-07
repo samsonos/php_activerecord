@@ -272,11 +272,12 @@ class dbMySQL extends dbMySQLConnector
                 continue;
             }
 
-            // Получим значение атрибута объекта защитив от инъекций, если объект передан
-            $value = $use_values ? $this->driver->quote($object->$map_attribute) : '';
-
-            // Добавим значение поля, в зависимости от вида вывывода метода
-            $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
+            // Only add attributes that have value
+            if ($object->$map_attribute != null) {
+                $value = $this->driver->quote($object->$map_attribute);
+                // Добавим значение поля, в зависимости от вида вывывода метода
+                $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
+            }
         }
 
         // Вернем полученную коллекцию

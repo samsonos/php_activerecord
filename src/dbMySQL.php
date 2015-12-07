@@ -1,5 +1,6 @@
 <?php
 namespace samson\activerecord;
+use samsonframework\orm\ConditionInterface;
 
 /**
  * Класс описывающий работу с MySQL
@@ -492,7 +493,7 @@ class dbMySQL extends dbMySQLConnector
         return $from;
     }
 
-    protected function getConditions(Condition $cond_group, $class_name)
+    protected function getConditions(ConditionInterface $cond_group, $class_name)
     {
         // Соберем сюда все сформированные условия для удобной "упаковки" их в строку
         $sql_condition = array();
@@ -500,7 +501,7 @@ class dbMySQL extends dbMySQLConnector
         // Переберем все аргументы условий в условной группе условия
         foreach ($cond_group as $argument) {
             // Если аргумент я вляется группой аргументов, разпарсим его дополнительно
-            if (is_a($argument, ns_classname('Condition', 'samson\activerecord'))) {
+            if (is_a($argument, '\samsonframework\orm\ConditionInterface')) {
                 $sql_condition[] = $this->getConditions($argument, $class_name);
             } else {
                 // Если условие успешно разпознано - добавим его в коллекцию условий

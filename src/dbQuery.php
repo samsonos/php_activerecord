@@ -413,7 +413,8 @@ class dbQuery extends \samsonframework\orm\Query
         }
 
         // Call parent constructor
-        parent::__construct($entity, db());
+        parent::__construct(db());
+        $this->entity($entity);
     }
 
     /**

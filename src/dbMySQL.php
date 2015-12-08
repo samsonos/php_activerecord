@@ -1,5 +1,7 @@
 <?php
 namespace samson\activerecord;
+
+use samsonframework\orm\QueryInterface;
 use samsonframework\orm\ConditionInterface;
 
 /**
@@ -154,7 +156,7 @@ class dbMySQL extends dbMySQLConnector
     /**
      * @see idb::find()
      */
-    public function &find($class_name, dbQuery $query)
+    public function &find($class_name, QueryInterface $query)
     {
         // Результат выполнения запроса
         $result = array();
@@ -378,10 +380,10 @@ class dbMySQL extends dbMySQLConnector
      * Create SQL request
      *
      * @param string $class_name Classname for request creating
-     * @param dbQuery $query Query with parameters
+     * @param QueryInterface $query Query with parameters
      * @return string SQL string
      */
-    protected function prepareSQL($class_name, dbQuery $query)
+    protected function prepareSQL($class_name, QueryInterface $query)
     {
         //elapsed( 'dbMySQL::find() Начало');
         $params = $this->__get_table_data($class_name);
@@ -455,7 +457,7 @@ class dbMySQL extends dbMySQLConnector
         return $sql;
     }
 
-    protected function prepareInnerSQL($class_name, dbQuery $query, $params)
+    protected function prepareInnerSQL($class_name, QueryInterface $query, $params)
     {
         //trace($class_name);
         //print_r($query->own_condition);

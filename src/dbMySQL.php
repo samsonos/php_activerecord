@@ -82,7 +82,7 @@ class dbMySQL extends dbMySQLConnector
         $class_name = str_replace(self::$prefix, '', $class_name);
 
         // Сформируем правильное имя класса
-        $class_name = strpos($class_name, '\\') ? $class_name : '\samson\activerecord\\'.$class_name;
+        $class_name = strpos($class_name, '\\') !== false ? $class_name : '\samson\activerecord\\'.$class_name;
 
         // Сформируем комманды на получение статических переменных определенного класса
         $_table_name = '$_table_name = ' . $class_name . '::$_table_name;';

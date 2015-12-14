@@ -1,6 +1,9 @@
 <?php
 namespace samson\activerecord;
 
+use samsonframework\orm\QueryInterface;
+use samsonframework\orm\ConditionInterface;
+
 /**
  * Класс описывающий работу с MySQL
  * @author Vitaly Iegorov <vitalyiegorov@gmail.com>
@@ -79,7 +82,7 @@ class dbMySQL extends dbMySQLConnector
         $class_name = str_replace(self::$prefix, '', $class_name);
 
         // Сформируем правильное имя класса
-        $class_name = ns_classname($class_name, 'samson\activerecord');
+        $class_name = strpos($class_name, '\\') !== false ? $class_name : '\samson\activerecord\\'.$class_name;
 
         // Сформируем комманды на получение статических переменных определенного класса
         $_table_name = '$_table_name = ' . $class_name . '::$_table_name;';
@@ -153,7 +156,7 @@ class dbMySQL extends dbMySQLConnector
     /**
      * @see idb::find()
      */
-    public function &find($class_name, dbQuery $query)
+    public function &find($class_name, QueryInterface $query)
     {
         // Результат выполнения запроса
         $result = array();
@@ -272,11 +275,12 @@ class dbMySQL extends dbMySQLConnector
                 continue;
             }
 
-            // Получим значение атрибута объекта защитив от инъекций, если объект передан
-            $value = $use_values ? $this->driver->quote($object->$map_attribute) : '';
-
-            // Добавим значение поля, в зависимости от вида вывывода метода
-            $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
+            // Only add attributes that have value
+            if ($object->$map_attribute != null) {
+                $value = $this->driver->quote($object->$map_attribute);
+                // Добавим значение поля, в зависимости от вида вывывода метода
+                $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
+            }
         }
 
         // Вернем полученную коллекцию
@@ -376,10 +380,10 @@ class dbMySQL extends dbMySQLConnector
      * Create SQL request
      *
      * @param string $class_name Classname for request creating
-     * @param dbQuery $query Query with parameters
+     * @param QueryInterface $query Query with parameters
      * @return string SQL string
      */
-    protected function prepareSQL($class_name, dbQuery $query)
+    protected function prepareSQL($class_name, QueryInterface $query)
     {
         //elapsed( 'dbMySQL::find() Начало');
         $params = $this->__get_table_data($class_name);
@@ -453,7 +457,7 @@ class dbMySQL extends dbMySQLConnector
         return $sql;
     }
 
-    protected function prepareInnerSQL($class_name, dbQuery $query, $params)
+    protected function prepareInnerSQL($class_name, QueryInterface $query, $params)
     {
         //trace($class_name);
         //print_r($query->own_condition);
@@ -491,7 +495,7 @@ class dbMySQL extends dbMySQLConnector
         return $from;
     }
 
-    protected function getConditions(Condition $cond_group, $class_name)
+    protected function getConditions(ConditionInterface $cond_group, $class_name)
     {
         // Соберем сюда все сформированные условия для удобной "упаковки" их в строку
         $sql_condition = array();
@@ -499,7 +503,7 @@ class dbMySQL extends dbMySQLConnector
         // Переберем все аргументы условий в условной группе условия
         foreach ($cond_group as $argument) {
             // Если аргумент я вляется группой аргументов, разпарсим его дополнительно
-            if (is_a($argument, ns_classname('Condition', 'samson\activerecord'))) {
+            if (is_a($argument, '\samsonframework\orm\ConditionInterface')) {
                 $sql_condition[] = $this->getConditions($argument, $class_name);
             } else {
                 // Если условие успешно разпознано - добавим его в коллекцию условий

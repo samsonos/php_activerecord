@@ -96,6 +96,13 @@ class Module extends CompressableExternalModule
         db()->generate(false, $this->cache_path);
     }
 
+    //[PHPCOMPRESSOR(remove,start)]
+    public function relations()
+    {
+        db()->relations($this->cache_path);
+    }
+    //[PHPCOMPRESSOR(remove,end)]
+
     /** @see \samson\core\ExternalModule::init() */
     public function init(array $params = array())
     {
@@ -108,7 +115,7 @@ class Module extends CompressableExternalModule
 
         //[PHPCOMPRESSOR(remove,start)]
         // Generate table relations
-        db()->relations($this->cache_path);
+        $this->relations();
         //[PHPCOMPRESSOR(remove,end)]
     }
 }

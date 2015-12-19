@@ -236,18 +236,6 @@ class dbMySQL extends dbMySQLConnector
         return $this->query($sql);
     }
 
-    /** Count query result */
-    public function count($className, $query)
-    {
-        // Get SQL
-        $sql = 'SELECT Count(*) as __Count FROM (' . $this->prepareSQL($className, $query) . ') as __table';
-
-        // Выполним запрос к БД
-        $result = $this->fetch($sql);
-
-        return $result[0]['__Count'];
-    }
-
     /**
      * Prepare create & update SQL statements fields
      * @param string $className Entity name

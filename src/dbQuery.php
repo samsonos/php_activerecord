@@ -261,12 +261,6 @@ class dbQuery extends \samsonframework\orm\Query
         return $this;
     }
 
-    /** @see idbQuery::count() */
-    public function count($field = '*')
-    {
-        return db()->count($this->class_name, $this);
-    }
-
     /** @see idbQuery::innerCount() */
     public function innerCount($field = '*')
     {

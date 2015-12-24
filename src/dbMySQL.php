@@ -51,7 +51,7 @@ class dbMySQL extends dbMySQLConnector
                 eval('$attributes = ' . $table . '::$_attributes;');
 
                 // Remove namespaces
-                $table = classname($table);
+                $table = \samson\core\AutoLoader::getOnlyClass($table);
 
                 // Make keys lowercase
                 $attributes = array_change_key_case_unicode($attributes);

@@ -43,7 +43,7 @@ class dbMySQL extends dbMySQLConnector
     public function createField($object, $table, $field, $type = 'INT')
     {
         // Check if db identifier field is configured
-        if (class_exists($table, false)) {
+        if (class_exists($table)) {
             if (strlen($object->$field)) {
                 // Variable to get all social table attributes
                 $attributes = array();

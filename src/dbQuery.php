@@ -406,6 +406,8 @@ class dbQuery extends \samsonframework\orm\Query
             $entity = '\samson\activerecord\\'.$entity;
         }
 
+	$this->order = &$this->sorting;
+
         // Call parent constructor
         parent::__construct(db());
         $this->entity($entity);

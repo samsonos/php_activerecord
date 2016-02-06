@@ -231,7 +231,7 @@ class dbMySQL extends dbMySQLConnector
     }
 
     /** @deprecated Use execute() */
-    public function &simple_query($sql)
+    public function simple_query($sql)
     {
         return $this->query($sql);
     }

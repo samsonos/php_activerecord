@@ -579,7 +579,7 @@ class dbMySQL extends dbMySQLConnector
         if (!isset(dbRecord::$instances[$className][$identifier]) || isset($dbData['__Count']) || sizeof($virtualFields)) {
 
             // Create empry dbRecord ancestor and store it to cache
-            dbRecord::$instances[$className][$identifier] = new $className();
+            dbRecord::$instances[$className][$identifier] = new $className($this, new dbQuery());
 
             // Pointer to object
             $object = &dbRecord::$instances[$className][$identifier];

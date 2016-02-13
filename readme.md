@@ -9,4 +9,4 @@ Basic ORM module
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/samsonos/php_activerecord/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/samsonos/php_activerecord/?branch=master)
 [![Total Downloads](https://poser.pugx.org/samsonos/php_activerecord/downloads.svg)](https://packagist.org/packages/samsonos/php_activerecord)
 
-Developed by [SamsonOS](http://samsonos.com/)  
+Developed by [SamsonOS](http://samsonos.com/)   

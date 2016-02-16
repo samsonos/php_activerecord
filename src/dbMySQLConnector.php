@@ -208,7 +208,21 @@ class dbMySQLConnector extends Database
                     else if ($table_name != $class_name) $vars_eval .= "\n\t" . '/** ' . $column['Field'] . ' */';
 
                     // Создадим саму переменную класса
-                    $vars_eval .= "\n\t" . 'public $' . $f_name . ' = "";';
+                    $value = $column['Null'] !== 'NO' ? ' = null' : ' = ""';
+
+                    // TODO: refactor
+                    switch (gettype($column['Default'])) {
+                        case 'string':
+                            switch ($column['Default']) {
+                                case 'CURRENT_TIMESTAMP': $value = ''; break;
+                                case '': $value = ' = ""'; break;
+                                default: $value = $column['Default'] !== null ? ' = "'.$column['Default'].'"' : $value;
+                            }
+                            break;
+                        case 'number': $value = $column['Default'] !== null ? ' = '.$column['Default'] : $value;
+                    }
+
+                    $vars_eval .= "\n\t" . 'public $' . $f_name . $value . ';';
 
                     // Добавим имя переменной
                     $defined_vars[$f_name] = $field;

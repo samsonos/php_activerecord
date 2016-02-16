@@ -264,7 +264,9 @@ class dbMySQL extends dbMySQLConnector
             }
 
             // Only add attributes that have value
-            $value = $object->$map_attribute !== null ? $this->driver->quote($object->$map_attribute) : 'NULL';
+            $value = $object->$map_attribute !== null ?
+                (is_numeric($object->$map_attribute)? $object->$map_attribute : $this->driver->quote($object->$map_attribute))
+                : 'NULL';
 
             // Добавим значение поля, в зависимости от вида вывывода метода
             $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;

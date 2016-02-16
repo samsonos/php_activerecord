@@ -231,7 +231,7 @@ class dbMySQL extends dbMySQLConnector
     }
 
     /** @deprecated Use execute() */
-    public function &simple_query($sql)
+    public function simple_query($sql)
     {
         return $this->query($sql);
     }
@@ -264,11 +264,10 @@ class dbMySQL extends dbMySQLConnector
             }
 
             // Only add attributes that have value
-            if ($object->$map_attribute != null) {
-                $value = $this->driver->quote($object->$map_attribute);
-                // Добавим значение поля, в зависимости от вида вывывода метода
-                $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
-            }
+            $value = $object->$map_attribute !== null ? $this->driver->quote($object->$map_attribute) : 'NULL';
+
+            // Добавим значение поля, в зависимости от вида вывывода метода
+            $collection[$map_attribute] = ($straight ? $className::$_table_name . '.' . $map_attribute . '=' : '') . $value;
         }
 
         // Вернем полученную коллекцию
@@ -579,7 +578,7 @@ class dbMySQL extends dbMySQLConnector
         if (!isset(dbRecord::$instances[$className][$identifier]) || isset($dbData['__Count']) || sizeof($virtualFields)) {
 
             // Create empry dbRecord ancestor and store it to cache
-            dbRecord::$instances[$className][$identifier] = new $className();
+            dbRecord::$instances[$className][$identifier] = new $className($this, new dbQuery());
 
             // Pointer to object
             $object = &dbRecord::$instances[$className][$identifier];

@@ -558,6 +558,8 @@ class dbMySQL extends dbMySQLConnector
                     case dbRelation::NOT_EQUAL:
                         return $sql_cond_t . ' NOT ' . $sql_values;
                 }
+            } else { // If we received a condition with empty array - consider this as failing condition
+                return '1 = 0';
             }
         }
     }

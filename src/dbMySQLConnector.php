@@ -561,11 +561,9 @@ class dbMySQLConnector extends Database
 
             // Save file to wwwrot
             $g->write($relations_file);
-
-            // Evaluate relations code
-            eval($g->code);
         } // Or just include file
-        else include($relations_file);
+
+        include($relations_file);
     }
 
     /**

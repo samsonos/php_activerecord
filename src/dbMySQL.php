@@ -131,7 +131,10 @@ class dbMySQL extends dbMySQLConnector
         $sql = 'INSERT INTO `' . $className::$_table_name . '` (`'
             . implode('`,`', array_keys($fields)) . '`)
             VALUES (' . implode(',', $fields) . ')';
-        $this->query($sql);
+
+        // TODO: CRITICAL FOR HIGHLOAD NEEDS DECISION!
+        $result = $this->execute($sql);
+
         // Return last inserted row identifier
         return $this->driver->lastInsertId();
     }

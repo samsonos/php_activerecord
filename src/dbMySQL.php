@@ -626,7 +626,7 @@ class dbMySQL extends dbMySQLConnector
     protected function &toRecords($class_name, array & $response, array $join = array(), array $virtual_fields = array())
     {
         // Сформируем правильное имя класса
-        $class_name = ns_classname($class_name, 'samson\activerecord');
+        $class_name = strpos($class_name, '\\') !== false ? $class_name : '\\samson\activerecord\\'.$class_name;
 
         // Результирующая коллекция полученных записей из БД
         $collection = array();

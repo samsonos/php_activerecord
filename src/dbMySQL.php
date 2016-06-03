@@ -48,16 +48,16 @@ class dbMySQL extends dbMySQLConnector
                 // Variable to get all social table attributes
                 $attributes = array();
                 // Get table attributes - PHP 5.2 compatible
-                eval('$attributes = ' . $table . '::$_attributes;');
-
-                // Remove namespaces
-                $table = \samson\core\AutoLoader::getOnlyClass($table);
+                eval('$attributes = ' . $table . '::$_table_attributes;');
+                // Get table name - PHP 5.2 compatible
+                eval('$table = ' . $table . '::$_table_name;');
 
                 // Make keys lowercase
                 $attributes = array_change_key_case_unicode($attributes);
+                $field = strtolower($object->$field);
 
                 // If table does not have defined identifier field
-                if (!isset($attributes[strtolower($object->$field)])) {
+                if (!array_key_exists($field, $attributes) && !in_array($field, $attributes)) {
                     // Add identifier field to social users table
                     $this->simple_query('ALTER TABLE  `' . $table . '` ADD  `' . $object->$field . '` ' . $type . ' ');
                 }
@@ -257,7 +257,7 @@ class dbMySQL extends dbMySQLConnector
         // Переберем "настоящее" имена атрибутов схемы данных для объекта
         foreach ($className::$_table_attributes as $attribute => $map_attribute) {
             // Отметки времени не заполняем
-            if ($className::$_types[$attribute] == 'timestamp') {
+            if ($className::$_types[$map_attribute] == 'timestamp') {
                 continue;
             }
 
@@ -267,8 +267,8 @@ class dbMySQL extends dbMySQLConnector
             }
 
             // Only add attributes that have value
-            $value = $object->$map_attribute !== null ?
-                (is_numeric($object->$map_attribute)? $object->$map_attribute : $this->driver->quote($object->$map_attribute))
+            $value = $object->$attribute !== null ?
+                (is_numeric($object->$attribute)? $object->$attribute : $this->driver->quote($object->$attribute))
                 : 'NULL';
 
             // Добавим значение поля, в зависимости от вида вывывода метода

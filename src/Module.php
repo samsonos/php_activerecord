@@ -112,10 +112,5 @@ class Module extends CompressableExternalModule
         dbMySQLConnector::$prefix = $this->prefix;
 
         db()->connect($this->name, $this->login, $this->pwd, $this->host, $this->port);
-
-        //[PHPCOMPRESSOR(remove,start)]
-        // Generate table relations
-        $this->relations();
-        //[PHPCOMPRESSOR(remove,end)]
     }
 }

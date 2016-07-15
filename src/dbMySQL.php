@@ -59,7 +59,7 @@ class dbMySQL extends dbMySQLConnector
                 // If table does not have defined identifier field
                 if (!array_key_exists($field, $attributes) && !in_array($field, $attributes)) {
                     // Add identifier field to social users table
-                    $this->simple_query('ALTER TABLE  `' . $table . '` ADD  `' . $object->$field . '` ' . $type . ' ');
+                    $this->simple_query('ALTER TABLE  `' . $table . '` ADD  `' . $field . '` ' . $type . ' ');
                 }
 
                 return true;

@@ -1,35 +1,31 @@
-<?php
+<?php declare(strict_types=1);
 namespace samson\activerecord;
-use samson\core\CompressableExternalModule;
 
-class Module extends CompressableExternalModule
+use samsonframework\core\CompressInterface;
+use samsonphp\core\ExternalModule;
+
+class Module extends ExternalModule implements CompressInterface
 {
+    /** Database table prefix */
+    public $prefix;
+    /** Database name */
+    public $name;
+    /** Login */
+    public $login = 'root';
+    /** Password */
+    public $pwd;
+    /** Host */
+    public $host = '127.0.0.1';
+    /** @var string Port number */
+    public $port = '';
+    public $relations = array();
+
+    /* Array of additional relations to set */
     /**
      * Идентификатор модуля
      * @var string
      */
     protected $id = 'activerecord';
-
-    /** Database table prefix */
-    public $prefix;
-
-    /** Database name */
-    public $name;
-
-    /** Login */
-    public $login = 'root';
-
-    /** Password */
-    public $pwd;
-
-    /** Host */
-    public $host = '127.0.0.1';
-
-    /** @var string Port number */
-    public $port = '';
-
-    /* Array of additional relations to set */
-    public $relations = array();
 
     /** @see \samson\core\CompressableExternalModule::beforeCompress() */
     public function beforeCompress(& $obj = null, array & $code = null)
@@ -101,6 +97,7 @@ class Module extends CompressableExternalModule
     {
         db()->relations($this->cache_path);
     }
+
     //[PHPCOMPRESSOR(remove,end)]
 
     /** @see \samson\core\ExternalModule::init() */

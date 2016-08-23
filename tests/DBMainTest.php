@@ -10,7 +10,7 @@ class DBMainTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        \samson\core\Error::$OUTPUT = false;
+        
     }
 
     public function testSpeed()

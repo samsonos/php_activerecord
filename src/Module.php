@@ -2,9 +2,9 @@
 namespace samson\activerecord;
 
 use samsonframework\core\CompressInterface;
-use samsonphp\core\ExternalModule;
+use samson\core\CompressableExternalModule;
 
-class Module extends ExternalModule implements CompressInterface
+class Module extends CompressableExternalModule implements CompressInterface
 {
     /** Database table prefix */
     public $prefix;

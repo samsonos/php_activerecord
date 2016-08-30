@@ -595,6 +595,7 @@ class dbMySQLConnector extends Database
         );
 
 
+        self::$tables = [];
         foreach ($rows as $row) {
             // Получим имя таблицы
             $table_name = $row['TABLE_NAME'];
@@ -661,13 +662,9 @@ class dbMySQLConnector extends Database
             file_put_contents($md5_file_func, '<?php ' . $db_func . '?>');
 
             // Подключим наш ХУК для АктивРекорда!!!!!
-            eval($db_classes);
-            eval($db_func);
         } // Иначе просто его подключим
-        else {
-            include($md5_file);
-            include($md5_file_func);
-        }
+        include_once($md5_file);
+        include_once($md5_file_func);
 
         //elapsed('end');
     }

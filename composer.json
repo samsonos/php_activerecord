@@ -26,10 +26,6 @@
     "classmap": ["src/"],
     "psr-0": {
       "samsonos\\activerecord\\": "src/"
-    },
-    "files": ["src/global.php"]
-  },
-  "extra": { 
-    "samsonframework_precontainer":"1"
+    }
   }
 }

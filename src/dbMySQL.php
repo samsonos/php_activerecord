@@ -139,7 +139,7 @@ class dbMySQL extends dbMySQLConnector
         return $this->driver->lastInsertId();
     }
 
-    public function update($className, &$object)
+    public function update_old($className, &$object)
     {
         // ??
         $fields = $this->getQueryFields($className, $object, true);
